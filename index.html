@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ختمة | تطبيق القرآن الكريم</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Tajawal:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+    <!-- Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    <!-- CSS -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    
+    <!-- Background Elements -->
+    <div class="bg-elements">
+        <div class="glow-circle gold"></div>
+        <div class="glow-circle green"></div>
+    </div>
+
+    <!-- Sidebar Navigation -->
+    <nav class="sidebar glass-panel">
+        <div class="logo">
+            <i class="ri-book-open-fill gold-text"></i>
+            <span>ختمة</span>
+        </div>
+        
+        <ul class="nav-links">
+            <li class="active" data-page="home">
+                <i class="ri-home-5-line"></i>
+                <span>الرئيسية</span>
+            </li>
+            <li data-page="quran">
+                <i class="ri-book-read-line"></i>
+                <span>المصحف</span>
+            </li>
+            <li data-page="khatmah">
+                <i class="ri-group-line"></i>
+                <span>الختمة الجماعية</span>
+            </li>
+            <li data-page="community">
+                <i class="ri-discuss-line"></i>
+                <span>المنتدى</span>
+            </li>
+        </ul>
+
+        <div class="daily-progress">
+            <div class="progress-title">
+                <span>الورد اليومي</span>
+                <span class="percentage" id="progress-percent">0%</span>
+            </div>
+            <div class="progress-bar-container">
+                <div class="progress-bar" id="daily-progress-bar" style="width: 0%"></div>
+            </div>
+            <p class="progress-desc">الصفحة 1 من 20</p>
+        </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+        <!-- Topbar -->
+        <header class="topbar">
+            <div class="date-widget" id="hijri-date">
+                <i class="ri-calendar-event-line"></i>
+                <span>1 رمضان 1447</span>
+            </div>
+            
+            <div class="user-profile">
+                <button class="icon-btn"><i class="ri-notification-3-line"></i></button>
+                <div class="avatar">
+                    <img src="https://ui-avatars.com/api/?name=User&background=C9A84C&color=0D1B2A" alt="المستخدم">
+                </div>
+            </div>
+        </header>
+
+        <!-- Pages Container -->
+        <div id="pages-container">
+            <!-- Home Page -->
+            <section id="page-home" class="page-section active">
+                <div class="welcome-card glass-panel">
+                    <div class="welcome-content">
+                        <h1>السلام عليكم ورحمة الله،</h1>
+                        <p>هل قرأت وردك اليوم؟ لقد اقتربت من إتمام الجزء الأول، استمر في بركتك!</p>
+                        <button class="btn-primary" onclick="app.navigateTo('quran')">
+                            متابعة القراءة <i class="ri-arrow-left-line"></i>
+                        </button>
+                    </div>
+                    <div class="welcome-image">
+                        <i class="ri-moon-cloudy-line gold-text" style="font-size: 8rem; opacity: 0.8;"></i>
+                    </div>
+                </div>
+
+                <div class="dashboard-grid">
+                    <div class="dash-card glass-panel">
+                        <div class="card-icon"><i class="ri-fire-fill gold-text"></i></div>
+                        <div class="card-info">
+                            <h3>أيام متتالية</h3>
+                            <p class="value">3 أيام</p>
+                        </div>
+                    </div>
+                    <div class="dash-card glass-panel">
+                        <div class="card-icon"><i class="ri-group-fill green-text"></i></div>
+                        <div class="card-info">
+                            <h3>ختمة العائلة</h3>
+                            <p class="value">الجزء 15</p>
+                            <p class="subtitle">متبقي 5 أجزاء</p>
+                        </div>
+                    </div>
+                    <div class="dash-card glass-panel">
+                        <div class="card-icon"><i class="ri-whatsapp-line" style="color: #25D366;"></i></div>
+                        <div class="card-info">
+                            <h3>شارك أورادك</h3>
+                            <p class="subtitle">أرسل تقدمك لعائلتك</p>
+                            <button class="btn-outline small mt-1" onclick="app.shareToWhatsApp()">شارك الآن</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="verse-of-day glass-panel mt-2">
+                    <div class="vod-header">
+                        <h3>آية اليوم</h3>
+                        <div class="actions">
+                            <button class="icon-btn"><i class="ri-heart-3-line"></i></button>
+                            <button class="icon-btn"><i class="ri-whatsapp-line"></i></button>
+                        </div>
+                    </div>
+                    <p class="quran-text">"إِنَّ هَذَا الْقُرْآنَ يَهْدِي لِلَّتِي هِيَ أَقْوَمُ وَيُبَشِّرُ الْمُؤْمِنِينَ الَّذِينَ يَعْمَلُونَ الصَّالِحَاتِ أَنَّ لَهُمْ أَجْرًا كَبِيرًا"</p>
+                    <span class="surah-name">سورة الإسراء - الآية ٩</span>
+                </div>
+            </section>
+
+            <!-- Quran Reader Page -->
+            <section id="page-quran" class="page-section">
+                <div class="quran-toolbar glass-panel">
+                    <div class="toolbar-group">
+                        <select id="surah-select" class="glass-select">
+                            <option value="">جاري تحميل السور...</option>
+                        </select>
+                        <div class="divider"></div>
+                        <span id="current-page-display">صفحة --</span>
+                    </div>
+                    <div class="toolbar-group">
+                        <button class="icon-btn" onclick="app.reader.prevPage()" title="الصفحة السابقة"><i class="ri-arrow-right-s-line"></i></button>
+                        <button class="icon-btn" onclick="app.reader.nextPage()" title="الصفحة التالية"><i class="ri-arrow-left-s-line"></i></button>
+                        <div class="divider"></div>
+                        <button class="icon-btn"><i class="ri-play-circle-line"></i></button>
+                        <button class="icon-btn"><i class="ri-settings-3-line"></i></button>
+                    </div>
+                </div>
+
+                <div class="quran-reader-container glass-panel">
+                    <div id="quran-page-content" class="quran-page">
+                        <!-- Quran lines will be injected here -->
+                        <div class="loading-spinner"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Khatmah Page -->
+            <section id="page-khatmah" class="page-section">
+                <!-- Dashboard / List View -->
+                <div id="khatmah-dashboard">
+                    <div class="welcome-card glass-panel mb-2">
+                        <div class="welcome-content">
+                            <h1>الختمات الجماعية</h1>
+                            <p>شارك الأجر مع أهلك وأصدقائك بختم القرآن الكريم معاً.</p>
+                            <div class="actions mt-1" style="display: flex; gap: 10px; flex-wrap: wrap;">
+                                <button class="btn-primary" onclick="app.khatmah.showCreateModal()">إنشاء ختمة <i class="ri-add-line"></i></button>
+                                <button class="btn-outline" onclick="app.khatmah.showJoinModal()">الانضمام لختمة <i class="ri-login-box-line"></i></button>
+                            </div>
+                        </div>
+                        <div class="welcome-image">
+                            <i class="ri-group-line gold-text" style="font-size: 7rem; opacity: 0.4;"></i>
+                        </div>
+                    </div>
+                    
+                    <h3 class="mt-2 mb-1" style="color:var(--text-secondary);">ختماتي الحالية</h3>
+                    <div id="my-khatmahs-list" class="khatmahs-list">
+                        <!-- Khatmahs will be injected here -->
+                        <div class="loading-spinner"></div>
+                    </div>
+                </div>
+
+                <!-- Khatmah Detail View -->
+                <div id="khatmah-detail" style="display: none;">
+                    <button class="btn-outline small mb-1" onclick="app.khatmah.backToDashboard()"><i class="ri-arrow-right-line"></i> عودة</button>
+                    
+                    <div class="khatmah-header glass-panel mb-2">
+                        <div class="khatmah-info">
+                            <h2 id="khatmah-title">اسم الختمة</h2>
+                            <p>الرمز دعوة: <span id="khatmah-code" class="highlight-text" onclick="app.khatmah.copyCode()" title="نسخ">... <i class="ri-clipboard-line"></i></span></p>
+                        </div>
+                        <div class="khatmah-progress-circle">
+                            <svg viewBox="0 0 36 36" class="circular-chart gold">
+                              <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                              <path class="circle" id="khatmah-progress-svg" stroke-dasharray="0, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                              <text x="18" y="20.35" class="percentage" id="khatmah-progress-text">0%</text>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <div class="ajza-grid" id="ajza-grid">
+                        <!-- 30 Juz cards injected via JS -->
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Modals -->
+    <!-- Registration Modal -->
+    <div id="name-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-content glass-panel">
+            <h2 class="gold-text mb-1"><i class="ri-moon-clear-fill"></i> أهلاً بك</h2>
+            <p style="margin-bottom: 20px; color: var(--text-secondary);">للمشاركة مع الجماعة، يرجى إدخال اسمك ليراه أصدقاؤك عند حجز الأجزاء:</p>
+            <input type="text" id="user-name-input" class="glass-input" placeholder="الاسم (مثال: أحمد، أم فلان)...">
+            <button class="btn-primary" style="width: 100%; justify-content: center;" onclick="app.saveUserName()">حفظ ومتابعة</button>
+        </div>
+    </div>
+
+    <!-- Create Khatmah Modal -->
+    <div id="create-khatmah-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-content glass-panel">
+            <h2 class="mb-1">إنشاء ختمة جديدة</h2>
+            <input type="text" id="khatmah-name-input" class="glass-input" placeholder="اسم الختمة (مثال: ختمة رمضان)...">
+            <div style="display: flex; gap: 10px; margin-top: 15px;">
+                <button class="btn-primary" style="flex:1; justify-content:center;" onclick="app.khatmah.create()">إنشاء</button>
+                <button class="btn-outline" style="flex:1;" onclick="app.khatmah.closeModals()">إلغاء</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Join Khatmah Modal -->
+    <div id="join-khatmah-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-content glass-panel">
+            <h2 class="mb-1">الانضمام لختمة</h2>
+            <p style="font-size: 0.9rem; margin-bottom: 15px; color: var(--text-secondary);">اطلب الرمز من منشئ الختمة</p>
+            <input type="text" id="khatmah-code-input" class="glass-input" placeholder="أدخل الرمز هنا..." style="text-align: center; letter-spacing: 2px;">
+            <div style="display: flex; gap: 10px; margin-top: 15px;">
+                <button class="btn-primary" style="flex:1; justify-content:center;" onclick="app.khatmah.join()">انضمام</button>
+                <button class="btn-outline" style="flex:1;" onclick="app.khatmah.closeModals()">إلغاء</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK (Version 8) -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    
+    <!-- Scripts -->
+    <script src="firebase-config.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

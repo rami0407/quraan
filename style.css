@@ -1,0 +1,691 @@
+/* =========================================
+   التصميم الإسلامي الفاخر - CSS Variables
+========================================= */
+
+:root {
+    /* الألوان الأساسية */
+    --bg-dark: #070e16;
+    --bg-darker: #04080d;
+    --gold-primary: #C9A84C;
+    --gold-dim: rgba(201, 168, 76, 0.2);
+    --green-islamic: #1B4332;
+    --green-dim: rgba(27, 67, 50, 0.3);
+    
+    /* ألوان النصوص */
+    --text-primary: #F8F9FA;
+    --text-secondary: #ADB5BD;
+    
+    /* Glassmorphism */
+    --glass-bg: rgba(255, 255, 255, 0.03);
+    --glass-border: rgba(255, 255, 255, 0.08);
+    --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    
+    /* الخطوط */
+    --font-ui: 'Tajawal', sans-serif;
+    --font-quran: 'Amiri', serif;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: var(--bg-dark);
+    color: var(--text-primary);
+    font-family: var(--font-ui);
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* =========================================
+   مؤثرات الإضاءة الخلفية
+========================================= */
+.bg-elements {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    overflow: hidden;
+}
+
+.glow-circle {
+    position: absolute;
+    width: 600px;
+    height: 600px;
+    border-radius: 50%;
+    filter: blur(140px);
+    opacity: 0.15;
+}
+
+.glow-circle.gold {
+    top: -200px;
+    right: -200px;
+    background: var(--gold-primary);
+}
+
+.glow-circle.green {
+    bottom: -200px;
+    left: -200px;
+    background: var(--green-islamic);
+}
+
+/* =========================================
+   مكونات مشتركة
+========================================= */
+.glass-panel {
+    background: var(--glass-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--glass-border);
+    border-radius: 20px;
+    box-shadow: var(--glass-shadow);
+}
+
+.gold-text { color: var(--gold-primary); }
+.green-text { color: #2ecc71; }
+.mt-1 { margin-top: 10px; }
+.mt-2 { margin-top: 20px; }
+
+/* أزرار */
+button {
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.3s ease;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #CFB059 0%, #B08D35 100%);
+    color: var(--bg-darker);
+    border: none;
+    padding: 12px 24px;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 4px 15px var(--gold-dim);
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px var(--gold-dim);
+}
+
+.btn-outline {
+    background: transparent;
+    border: 1px solid var(--gold-primary);
+    color: var(--gold-primary);
+    padding: 8px 16px;
+    border-radius: 8px;
+}
+
+.btn-outline:hover {
+    background: var(--gold-dim);
+}
+
+.icon-btn {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    color: var(--text-primary);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.2rem;
+}
+
+.icon-btn:hover {
+    background: var(--gold-dim);
+    color: var(--gold-primary);
+    border-color: var(--gold-primary);
+}
+
+/* =========================================
+   الشريط الجانبي (Sidebar)
+========================================= */
+.sidebar {
+    width: 280px;
+    height: calc(100vh - 40px);
+    margin: 20px 20px 20px 0;
+    display: flex;
+    flex-direction: column;
+    padding: 30px 20px;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 2rem;
+    font-weight: 800;
+    margin-bottom: 50px;
+}
+
+.nav-links {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex: 1;
+}
+
+.nav-links li {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px 20px;
+    border-radius: 14px;
+    font-size: 1.1rem;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.nav-links li:hover {
+    background: var(--glass-bg);
+    color: var(--text-primary);
+}
+
+.nav-links li.active {
+    background: var(--gold-dim);
+    color: var(--gold-primary);
+    font-weight: 700;
+    border-right: 4px solid var(--gold-primary);
+}
+
+.nav-links li i { font-size: 1.4rem; }
+
+/* الورد اليومي */
+.daily-progress {
+    background: rgba(0,0,0,0.2);
+    padding: 20px;
+    border-radius: 16px;
+    border: 1px solid var(--glass-border);
+}
+
+.progress-title {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    font-size: 0.9rem;
+}
+
+.percentage { color: var(--gold-primary); font-weight: 700; }
+
+.progress-bar-container {
+    height: 6px;
+    background: #2a3541;
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 8px;
+}
+
+.progress-bar {
+    height: 100%;
+    background: var(--gold-primary);
+    border-radius: 3px;
+    transition: width 0.5s ease;
+}
+
+.progress-desc {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+
+/* =========================================
+   المحتوى الرئيسي
+========================================= */
+.main-content {
+    flex: 1;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+/* الشريط العلوي */
+.topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.date-widget {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--glass-bg);
+    padding: 10px 20px;
+    border-radius: 20px;
+    border: 1px solid var(--glass-border);
+    font-size: 1.1rem;
+}
+
+.user-profile {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.avatar img {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--gold-primary);
+}
+
+/* إدارة الصفحات */
+#pages-container {
+    flex: 1;
+    position: relative;
+    overflow-y: auto;
+    padding-right: 10px;
+}
+
+#pages-container::-webkit-scrollbar { width: 6px; }
+#pages-container::-webkit-scrollbar-track { background: transparent; }
+#pages-container::-webkit-scrollbar-thumb { background: var(--glass-border); border-radius: 10px; }
+
+.page-section {
+    display: none;
+    animation: fadeIn 0.4s ease forwards;
+}
+
+.page-section.active { display: block; }
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* =========================================
+   الصفحة الرئيسية
+========================================= */
+.welcome-card {
+    display: flex;
+    justify-content: space-between;
+    padding: 40px;
+    margin-bottom: 30px;
+    position: relative;
+    overflow: hidden;
+}
+
+.welcome-content h1 {
+    font-size: 2.2rem;
+    margin-bottom: 15px;
+}
+
+.welcome-content p {
+    color: var(--text-secondary);
+    font-size: 1.2rem;
+    margin-bottom: 30px;
+    max-width: 80%;
+}
+
+.welcome-image {
+    position: absolute;
+    left: 20px;
+    bottom: -20px;
+}
+
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+
+.dash-card {
+    padding: 25px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.card-icon {
+    width: 60px;
+    height: 60px;
+    background: rgba(0,0,0,0.3);
+    border-radius: 16px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 2rem;
+}
+
+.card-info h3 {
+    font-size: 1rem;
+    color: var(--text-secondary);
+    margin-bottom: 5px;
+}
+
+.card-info .value {
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.card-info .subtitle {
+    font-size: 0.85rem;
+    color: var(--gold-primary);
+}
+
+.verse-of-day {
+    padding: 30px;
+    text-align: center;
+    position: relative;
+}
+
+.vod-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.quran-text {
+    font-family: var(--font-quran);
+    font-size: 2rem;
+    line-height: 2;
+    color: var(--gold-primary);
+    margin-bottom: 20px;
+}
+
+/* =========================================
+   عارض القرآن (Quran Reader)
+========================================= */
+.quran-toolbar {
+    display: flex;
+    justify-content: space-between;
+    padding: 15px 25px;
+    margin-bottom: 20px;
+}
+
+.toolbar-group {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.divider {
+    width: 1px;
+    height: 24px;
+    background: var(--glass-border);
+}
+
+.glass-select {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    color: #fff;
+    padding: 10px 15px;
+    border-radius: 10px;
+    font-family: inherit;
+    outline: none;
+    cursor: pointer;
+}
+
+.glass-select option {
+    background: var(--bg-dark);
+    color: #fff;
+}
+
+.quran-reader-container {
+    padding: 40px;
+    min-height: 600px;
+    display: flex;
+    justify-content: center;
+    background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M50 0L60 40L100 50L60 60L50 100L40 60L0 50L40 40Z" fill="rgba(201,168,76,0.03)"/></svg>') center center;
+}
+
+.quran-page {
+    font-family: var(--font-quran);
+    max-width: 800px;
+    text-align: justify;
+    text-align-last: center;
+    direction: rtl;
+    line-height: 2.8;
+}
+
+.quran-word {
+    font-size: 2.2rem;
+    color: var(--text-primary);
+    margin: 0 4px;
+    display: inline-block;
+}
+
+.ayah-end {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    width: 40px;
+    height: 40px;
+    background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 54 54"><path d="M27 0L33 11L45 11L41 21L50 30L41 39L45 49L33 49L27 60L21 49L9 49L13 39L4 30L13 21L9 11L21 11Z" fill="none" stroke="%23C9A84C" stroke-width="2"/></svg>') no-repeat center;
+    background-size: contain;
+    font-size: 1.2rem;
+    font-family: var(--font-ui);
+    color: var(--gold-primary);
+    margin: 0 10px;
+    position: relative;
+    top: 5px;
+}
+
+.ayah-end span {
+    position: relative;
+    top: -2px;
+}
+
+.bismillah {
+    text-align: center;
+    font-size: 2.5rem;
+    color: var(--gold-primary);
+    width: 100%;
+    margin-bottom: 30px;
+    display: block;
+}
+
+.surah-header {
+    text-align: center;
+    border-top: 2px solid var(--gold-primary);
+    border-bottom: 2px solid var(--gold-primary);
+    padding: 10px 0;
+    margin: 20px 0 30px 0;
+    font-size: 1.5rem;
+    color: var(--gold-primary);
+    background: var(--gold-dim);
+}
+
+.loading-spinner {
+    width: 50px;
+    height: 50px;
+    border: 5px solid var(--glass-border);
+    border-top-color: var(--gold-primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 50px auto;
+}
+
+@keyframes spin {
+    100% { transform: rotate(360deg); }
+}
+
+/* =========================================
+   التجاوب (Responsive)
+========================================= */
+@media (max-width: 900px) {
+    .dashboard-grid { grid-template-columns: 1fr; }
+    .sidebar { position: fixed; right: -300px; z-index: 100; transition: 0.3s; }
+}
+
+/* =========================================
+   النوافذ المنبثقة (Modals)
+========================================= */
+.modal-overlay {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    padding: 30px;
+    width: 90%;
+    max-width: 400px;
+    text-align: center;
+    animation: zoomIn 0.3s ease;
+}
+
+@keyframes zoomIn {
+    from { transform: scale(0.9); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+.glass-input {
+    width: 100%;
+    background: rgba(0,0,0,0.2);
+    border: 1px solid var(--glass-border);
+    color: white;
+    padding: 12px;
+    border-radius: 10px;
+    font-family: inherit;
+    font-size: 1.1rem;
+    outline: none;
+    margin-bottom: 10px;
+    transition: 0.3s;
+}
+
+.glass-input:focus {
+    border-color: var(--gold-primary);
+}
+
+/* =========================================
+   الختمة الجماعية
+========================================= */
+.khatmahs-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.khatmah-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.khatmah-item:hover {
+    background: var(--gold-dim);
+}
+
+.khatmah-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 30px;
+}
+
+.highlight-text {
+    color: var(--gold-primary);
+    cursor: pointer;
+    font-weight: bold;
+    background: rgba(0,0,0,0.3);
+    padding: 4px 8px;
+    border-radius: 6px;
+}
+
+.ajza-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.juz-card {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 15px;
+    padding: 20px 10px;
+    text-align: center;
+    cursor: pointer;
+    transition: 0.3s;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.juz-card.available {
+    border-color: #2ecc71;
+}
+
+.juz-card.available:hover {
+    background: rgba(46, 204, 113, 0.2);
+}
+
+.juz-card.claimed {
+    border-color: #f1c40f;
+    background: rgba(241, 196, 15, 0.1);
+}
+
+.juz-card.completed {
+    border-color: #3498db;
+    background: rgba(52, 152, 219, 0.2);
+    opacity: 0.8;
+}
+
+.juz-number {
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.juz-status {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+.juz-owner {
+    font-size: 0.8rem;
+    color: white;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* دائرة التقدم الخاصة بالختمة */
+.circular-chart {
+    display: block;
+    margin: 0 auto;
+    max-width: 80px;
+    max-height: 80px;
+}
+.circle-bg {
+    fill: none;
+    stroke: rgba(255,255,255,0.1);
+    stroke-width: 3.8;
+}
+.circle {
+    fill: none;
+    stroke: var(--gold-primary);
+    stroke-width: 2.8;
+    stroke-linecap: round;
+    transition: stroke-dasharray 1s ease-out;
+}
+.circular-chart text {
+    fill: white;
+    font-family: inherit;
+    font-size: 8px;
+    text-anchor: middle;
+    font-weight: bold;
+}
