@@ -37,6 +37,10 @@
                 <i class="ri-book-read-line"></i>
                 <span>المصحف</span>
             </li>
+            <li data-page="hifz">
+                <i class="ri-brain-line"></i>
+                <span>المحفوظات</span>
+            </li>
             <li data-page="khatmah">
                 <i class="ri-group-line"></i>
                 <span>الختمة الجماعية</span>
@@ -63,9 +67,14 @@
     <main class="main-content">
         <!-- Topbar -->
         <header class="topbar">
-            <div class="date-widget" id="hijri-date">
-                <i class="ri-calendar-event-line"></i>
-                <span>1 رمضان 1447</span>
+            <div style="display: flex; gap: 15px; align-items: center;">
+                <button class="icon-btn mobile-only" onclick="app.toggleMobileSidebar()" style="display: none;">
+                    <i class="ri-menu-fill"></i>
+                </button>
+                <div class="date-widget" id="hijri-date">
+                    <i class="ri-calendar-event-line"></i>
+                    <span>1 رمضان 1447</span>
+                </div>
             </div>
             
             <div class="user-profile">
@@ -144,6 +153,9 @@
                     </div>
                     
                     <div class="toolbar-group" style="margin-right: auto;">
+                        <button class="icon-btn" id="toggle-color-btn" onclick="app.hifz.toggleColorMode()" title="تحديد الآيات"><i class="ri-brush-line"></i></button>
+                        <button class="icon-btn" id="toggle-test-btn" onclick="app.hifz.toggleTestMode()" title="وضع التسميع"><i class="ri-eye-off-line"></i></button>
+                        <div class="divider"></div>
                         <button class="icon-btn" id="jump-bookmark-btn" onclick="app.reader.jumpToBookmark()" title="العودة لعلامتي" style="display: none;"><i class="ri-bookmark-fill gold-text"></i></button>
                         <div class="divider"></div>
                         <button class="icon-btn" onclick="app.reader.changeFontSize(-1)" title="تصغير الخط"><i class="ri-font-size" style="font-size: 0.9rem;"></i></button>
@@ -164,6 +176,51 @@
                 </div>
             </section>
 
+            <!-- Hifz Dashboard Page -->
+            <section id="page-hifz" class="page-section">
+                <div class="welcome-card glass-panel mb-2">
+                    <div class="welcome-content">
+                        <h1>زاوية المحفوظات</h1>
+                        <p>تابع تقدمك، راجع ما حفظت، وثبّت القرآن في قلبك عبر التكرار والتسميع.</p>
+                    </div>
+                    <div class="welcome-image">
+                        <i class="ri-brain-line gold-text" style="font-size: 7rem; opacity: 0.4;"></i>
+                    </div>
+                </div>
+
+                <div class="dashboard-grid mb-2">
+                    <div class="dash-card glass-panel" style="border-right: 4px solid #2ecc71;">
+                        <div class="card-icon"><i class="ri-checkbox-circle-fill" style="color: #2ecc71;"></i></div>
+                        <div class="card-info">
+                            <h3>حفظ متين</h3>
+                            <p class="value" id="hifz-strong-count">0 آية</p>
+                        </div>
+                    </div>
+                    <div class="dash-card glass-panel" style="border-right: 4px solid #f1c40f;">
+                        <div class="card-icon"><i class="ri-time-fill" style="color: #f1c40f;"></i></div>
+                        <div class="card-info">
+                            <h3>قيد الحفظ</h3>
+                            <p class="value" id="hifz-learning-count">0 آية</p>
+                        </div>
+                    </div>
+                    <div class="dash-card glass-panel" style="border-right: 4px solid #e74c3c;">
+                        <div class="card-icon"><i class="ri-alert-fill" style="color: #e74c3c;"></i></div>
+                        <div class="card-info">
+                            <h3>يحتاج مراجعة</h3>
+                            <p class="value" id="hifz-weak-count">0 آية</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; margin-top: 20px;">
+                    <h2 style="font-size: 1.2rem; color: var(--gold-primary);">أورادي ومفضلتي</h2>
+                    <button class="primary-btn" style="padding: 8px 15px; font-size: 0.9rem;" onclick="app.hifz.showAddWirdModal()"><i class="ri-add-line"></i> إضافة</button>
+                </div>
+                <div id="custom-wirds-list" style="display: flex; flex-direction: column; gap: 10px;">
+                    <p style="text-align:center; color: var(--text-secondary); opacity: 0.8; margin-top: 20px;">لم تقم بإضافة أي أوراد خاصة بعد.</p>
+                </div>
+            </section>
+
             <!-- Khatmah Page -->
             <section id="page-khatmah" class="page-section">
                 <!-- Dashboard / List View -->
@@ -171,10 +228,11 @@
                     <div class="welcome-card glass-panel mb-2">
                         <div class="welcome-content">
                             <h1>الختمات الجماعية</h1>
-                            <p>شارك الأجر مع أهلك وأصدقائك بختم القرآن الكريم معاً.</p>
-                            <div class="actions mt-1" style="display: flex; gap: 10px; flex-wrap: wrap;">
-                                <button class="btn-primary" onclick="app.khatmah.showCreateModal()">إنشاء ختمة <i class="ri-add-line"></i></button>
-                                <button class="btn-outline" onclick="app.khatmah.showJoinModal()">الانضمام لختمة <i class="ri-login-box-line"></i></button>
+                            <p>ابدأ رحلتك القرآنية بتنظيم ختمة لتبادل الأجزاء أو ختمة تنافسية هجرية.</p>
+                            <div class="actions mt-1" style="display: flex; gap: 8px; flex-wrap: wrap;">
+                                <button class="btn-primary" style="padding: 10px 15px; font-size: 0.95rem; background: linear-gradient(135deg, #2c3e50, #1a252f); color: white;" onclick="app.khatmah.showCreateModal('partitioned')">إنشاء ختمة عادية <i class="ri-pie-chart-2-line"></i></button>
+                                <button class="btn-primary" style="padding: 10px 15px; font-size: 0.95rem; background: linear-gradient(135deg, #2ecc71, #27ae60); color: white;" onclick="app.khatmah.showCreateModal('monthly')">الختمة الهجرية <i class="ri-calendar-event-line"></i></button>
+                                <button class="btn-outline" style="padding: 10px 15px; font-size: 0.95rem; background: rgba(255,255,255,0.05);" onclick="app.khatmah.showJoinModal()">انضمام <i class="ri-login-box-line"></i></button>
                             </div>
                         </div>
                         <div class="welcome-image">
@@ -210,6 +268,11 @@
                     <div class="ajza-grid" id="ajza-grid">
                         <!-- 30 Juz cards injected via JS -->
                     </div>
+
+                    <!-- Monthly Khatmah Calendar Grid -->
+                    <div id="monthly-days-grid" class="ajza-grid" style="display: none;">
+                        <!-- 30 Calendar Cards injected via JS -->
+                    </div>
                 </div>
             </section>
 
@@ -237,7 +300,45 @@
     </main>
 
     <!-- Modals -->
-    <!-- Registration Modal -->
+    <div class="modal-overlay" id="add-wird-modal" style="display: none;">
+        <div class="modal-content glass-panel" style="max-width: 400px; display: flex; flex-direction: column; gap: 15px;">
+            <h2 style="font-family: var(--font-primary); color: var(--gold-primary); text-align: center;">إضافة ورد أو مفضلة</h2>
+            
+            <input type="text" id="wird-name-input" class="quran-input" placeholder="اسم الورد (مثال: أواخر البقرة)">
+            
+            <select id="wird-surah-select" class="quran-input text-center" style="font-family: var(--font-primary);" onchange="app.hifz.wirdSurahChanged()">
+                <option value="">اختيار السورة...</option>
+                <!-- Surahs populated from app.state.surahs -->
+            </select>
+            
+            <div style="display: flex; gap: 10px;">
+                <input type="number" id="wird-from-ayah" class="quran-input" placeholder="من آية" min="1" style="flex: 1;">
+                <input type="number" id="wird-to-ayah" class="quran-input" placeholder="إلى آية" min="1" style="flex: 1;">
+            </div>
+            <small style="color: var(--text-secondary); text-align: center;" id="wird-ayah-hint">الرجاء اختيار السورة أولاً</small>
+            
+            <div style="display: flex; gap: 10px; margin-top: 5px;">
+                <button class="primary-btn" style="flex: 1;" onclick="app.hifz.saveCustomWird()">حفظ الورد</button>
+                <button class="secondary-btn" style="flex: 1;" onclick="app.hifz.closeAddWirdModal()">إلغاء</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="mini-reader-overlay" style="display: none; align-items: flex-end;">
+        <div class="glass-panel" style="width: 100%; height: 90vh; border-radius: 20px 20px 0 0; display: flex; flex-direction: column; background: var(--bg-primary);">
+            <div style="padding: 15px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
+                <h3 id="mini-reader-title" style="color: var(--gold-primary); margin:0; font-family: var(--font-primary);">قراءة الورد</h3>
+                <div style="display: flex; gap: 15px;">
+                    <button class="icon-btn" id="mini-toggle-test-btn" onclick="app.hifz.toggleMiniTestMode()" title="وضع التسميع"><i class="ri-eye-off-line"></i></button>
+                    <button class="icon-btn" onclick="app.hifz.closeMiniReader()"><i class="ri-close-line" style="color: var(--text-secondary);"></i></button>
+                </div>
+            </div>
+            <div id="mini-reader-content" class="p-4 quran-page" style="flex: 1; overflow-y: auto; text-align: justify; direction: rtl; font-family: var(--font-primary);">
+                <!-- Ayahs will go here -->
+            </div>
+        </div>
+    </div>
+
     <div id="name-modal" class="modal-overlay" style="display: none;">
         <div class="modal-content glass-panel">
             <h2 class="gold-text mb-1"><i class="ri-moon-clear-fill"></i> أهلاً بك</h2>
@@ -251,9 +352,55 @@
     <div id="create-khatmah-modal" class="modal-overlay" style="display: none;">
         <div class="modal-content glass-panel">
             <h2 class="mb-1">إنشاء ختمة جديدة</h2>
-            <input type="text" id="khatmah-name-input" class="glass-input" placeholder="اسم الختمة (مثال: ختمة رمضان)...">
+            <input type="text" id="khatmah-name-input" class="glass-input mb-1" placeholder="اسم الختمة (مثال: ختمة رمضان)...">
+            <select id="khatmah-type-select" style="display: none;">
+                <option value="partitioned">ختمة الأجزاء المقسمة (المعتادة)</option>
+                <option value="monthly">الختمة الشهرية التنافسية (جزء يومياً)</option>
+            </select>
             <div style="display: flex; gap: 10px; margin-top: 15px;">
                 <button class="btn-primary" style="flex:1; justify-content:center;" onclick="app.khatmah.create()">إنشاء</button>
+                <button class="btn-outline" style="flex:1;" onclick="app.khatmah.closeModals()">إلغاء</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Monthly Day Detail Modal -->
+    <div id="monthly-day-modal" class="modal-overlay" style="display: none; z-index: 2000;">
+        <div class="modal-content glass-panel" style="max-width: 400px; padding: 20px;">
+            <div style="text-align: center; margin-bottom: 20px;">
+                <h2 id="modal-day-title" style="color: var(--gold-primary);">اليوم 1</h2>
+                <p id="modal-juz-title" style="color: var(--text-secondary); margin-top: 5px;">المستهدف: الجزء 1</p>
+            </div>
+            
+            <div class="my-progress-action mb-2" style="text-align: center;">
+                <button class="btn-primary" style="width: 100%; justify-content: center; margin-bottom: 15px; background: linear-gradient(135deg, #2ecc71, #27ae60); font-size: 1.1rem; padding: 12px;" onclick="app.khatmah.readJuzForKhatmah()">📖 اقرأ الجزء الآن داخل التطبيق</button>
+                
+                <p style="margin-bottom: 10px; font-size: 0.9rem; color: var(--text-secondary);">التحديد اليدوي (لمن يقرأ من المصحف الورقي):</p>
+                <div style="display: flex; justify-content: center; gap: 8px; flex-wrap: wrap;">
+                    <button class="btn-outline" style="border-color: #2ecc71; color: #2ecc71; padding: 8px 12px; font-size:0.9rem;" onclick="app.khatmah.setMonthlyProgress('full')">أتممت ✅</button>
+                    <button class="btn-outline" style="border-color: #f1c40f; color: #f1c40f; padding: 8px 12px; font-size:0.9rem;" onclick="app.khatmah.setMonthlyProgress('half')">البعض 🟡</button>
+                    <button class="btn-outline" style="color: var(--text-secondary); padding: 8px 12px; font-size:0.9rem;" onclick="app.khatmah.setMonthlyProgress('none')">تراجع ❌</button>
+                </div>
+            </div>
+
+            <div class="members-board" style="background: rgba(0,0,0,0.2); padding: 15px; border-radius: 12px;">
+                <h3 style="margin-bottom: 15px; color: var(--gold-dim); font-size: 1rem;"><i class="ri-medal-fill"></i> لوحة شرف هذا اليوم</h3>
+                <div id="monthly-modal-members-list" style="display: flex; flex-direction: column; gap: 10px; max-height: 200px; overflow-y: auto;">
+                    <!-- Members progress injected via JS -->
+                </div>
+            </div>
+            
+            <button class="btn-primary mt-2" style="width: 100%; justify-content: center;" onclick="document.getElementById('monthly-day-modal').style.display='none'">إغلاق</button>
+        </div>
+    </div>
+
+    <!-- Edit Khatmah Modal -->
+    <div id="edit-khatmah-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-content glass-panel">
+            <h2 class="mb-1"><i class="ri-edit-line"></i> تعديل الختمة</h2>
+            <input type="text" id="edit-khatmah-name-input" class="glass-input" placeholder="اسم الختمة الجديد..." style="margin-bottom: 15px;">
+            <div style="display: flex; gap: 10px; margin-top: 15px;">
+                <button class="btn-primary" style="flex:1; justify-content:center;" onclick="app.khatmah.saveEditKhatmah()">حفظ التعديل</button>
                 <button class="btn-outline" style="flex:1;" onclick="app.khatmah.closeModals()">إلغاء</button>
             </div>
         </div>

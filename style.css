@@ -500,6 +500,53 @@ button {
     top: -2px;
 }
 
+/* =========================================
+   التلوين ووضع التسميع (Hifz Modes)
+========================================= */
+
+.ayah-wrap {
+    transition: background-color 0.3s ease;
+    border-radius: 8px;
+    padding: 0 5px;
+}
+
+.ayah-wrap.status-strong {
+    background-color: rgba(46, 204, 113, 0.2) !important;
+}
+
+.ayah-wrap.status-learning {
+    background-color: rgba(241, 196, 15, 0.2) !important;
+}
+
+.ayah-wrap.status-weak {
+    background-color: rgba(231, 76, 60, 0.2) !important;
+}
+
+.color-mode-active {
+    background: var(--gold-dim) !important;
+    border: 1px solid var(--gold-primary) !important;
+    color: var(--gold-primary) !important;
+}
+
+.test-mode-active {
+    background: var(--gold-dim) !important;
+    border: 1px solid var(--gold-primary) !important;
+    color: var(--gold-primary) !important;
+}
+
+.quran-page.test-mode .quran-word {
+    filter: blur(6px);
+    opacity: 0.5;
+    transition: filter 0.3s, opacity 0.3s;
+    cursor: pointer;
+}
+
+.quran-page.test-mode .quran-word:hover,
+.quran-page.test-mode .quran-word:active {
+    filter: blur(0);
+    opacity: 1;
+}
+
 .ayah-bookmark {
     background: none;
     border: none;
@@ -882,4 +929,178 @@ button {
 
 .action-btn.delete-btn:hover {
     color: #e74c3c;
+}
+
+/* =========================================
+   المدخلات والأزرار (Premium Inputs & Buttons)
+========================================= */
+
+.quran-input {
+    width: 100%;
+    padding: 12px 15px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    color: var(--text-primary);
+    font-size: 1rem;
+    font-family: inherit;
+    transition: all 0.3s ease;
+    outline: none;
+    box-sizing: border-box;
+}
+
+.quran-input::placeholder {
+    color: var(--text-secondary);
+    opacity: 0.7;
+}
+
+.quran-input:focus {
+    border-color: var(--gold-primary);
+    background: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 0 0 2px rgba(201, 168, 76, 0.2);
+}
+
+select.quran-input {
+    appearance: auto;
+    color-scheme: dark;
+}
+
+select.quran-input option {
+    background-color: #1a1a1a !important;
+    color: #ffffff !important;
+    padding: 10px;
+}
+
+.primary-btn, .secondary-btn {
+    padding: 12px 20px;
+    border-radius: 12px;
+    font-size: 1.05rem;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border: none;
+    outline: none;
+}
+
+.primary-btn {
+    background: linear-gradient(135deg, var(--gold-primary), #B8860B);
+    color: #111;
+    box-shadow: 0 4px 15px rgba(201, 168, 76, 0.2);
+}
+
+.primary-btn:hover {
+    background: linear-gradient(135deg, #d4af37, #f1c40f);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(201, 168, 76, 0.4);
+}
+
+.secondary-btn {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-primary);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.secondary-btn:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
+}
+
+/* =========================================
+   التجاوب مع الهاتف (Responsive / Mobile)
+========================================= */
+
+.mobile-only {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    .mobile-only {
+        display: flex !important;
+    }
+
+    body {
+        padding: 5px;
+    }
+
+    .app-container {
+        flex-direction: column;
+    }
+
+    .sidebar {
+        position: fixed;
+        right: -100%;
+        top: 0;
+        height: 100vh;
+        z-index: 1050;
+        margin: 0;
+        border-radius: 0;
+        background: var(--bg-primary); /* Overriding glass-panel partially for solidness */
+        box-shadow: -5px 0 20px rgba(0,0,0,0.7);
+        transition: right 0.3s ease;
+        padding: 20px;
+        width: 80%;
+    }
+
+    .sidebar.active {
+        right: 0;
+    }
+
+    #mobile-sidebar-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0,0,0,0.5);
+        z-index: 1000;
+        backdrop-filter: blur(2px);
+    }
+
+    .content-wrapper {
+        margin: 0;
+        padding: 10px;
+        height: calc(100vh - 10px);
+    }
+
+    .app-header {
+        flex-direction: row;
+        gap: 15px;
+        align-items: center;
+        padding: 15px;
+    }
+
+    .app-header > div:last-child {
+        display: none; /* Hide the date entirely on narrow screens to save space */
+    }
+
+    .quran-toolbar {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 5px;
+    }
+
+    .quran-toolbar button {
+        padding: 5px 10px;
+    }
+
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .modal-content, #add-wird-modal .modal-content {
+        width: 95% !important;
+        max-width: 95% !important;
+        margin: 0 auto;
+    }
+    
+    #mini-reader-overlay .glass-panel {
+        height: 98vh;
+        padding: 5px;
+    }
 }
