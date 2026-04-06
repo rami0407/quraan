@@ -1,16 +1,14 @@
 // firebase-config.js
-// إعدادات Firebase الخاصة بتطبيقك
-// يرجى النقر على إعدادات المشروع (Project Settings) في لوحة تحكم Firebase
-// ثم نسخ إعدادات الجزء الخاص بالويب ولصقها هنا مكان القيم الموجودة (YOUR_...)
 
 const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-    databaseURL: "https://YOUR_PROJECT_ID-default-rtdb.firebaseio.com",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_PROJECT_ID.appspot.com",
-    messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-    appId: "YOUR_APP_ID"
+  apiKey: "AIzaSyAHRILjNdZX6vygOx_lYyMTqlp-I86s-n0",
+  authDomain: "qoraan-c95c1.firebaseapp.com",
+  databaseURL: "https://qoraan-c95c1-default-rtdb.firebaseio.com",
+  projectId: "qoraan-c95c1",
+  storageBucket: "qoraan-c95c1.firebasestorage.app",
+  messagingSenderId: "429753405831",
+  appId: "1:429753405831:web:e567cbf5e2bbdf0229c322",
+  measurementId: "G-D6BBEPV4T8"
 };
 
 // تهيئة تطبيق Firebase

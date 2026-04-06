@@ -134,20 +134,21 @@
 
             <!-- Quran Reader Page -->
             <section id="page-quran" class="page-section">
-                <div class="quran-toolbar glass-panel">
+                <div class="quran-toolbar glass-panel" style="flex-wrap: wrap; gap: 10px;">
                     <div class="toolbar-group">
                         <select id="surah-select" class="glass-select">
                             <option value="">جاري تحميل السور...</option>
                         </select>
                         <div class="divider"></div>
-                        <span id="current-page-display">صفحة --</span>
+                        <span id="current-page-display">--</span>
                     </div>
-                    <div class="toolbar-group">
-                        <button class="icon-btn" onclick="app.reader.prevPage()" title="الصفحة السابقة"><i class="ri-arrow-right-s-line"></i></button>
-                        <button class="icon-btn" onclick="app.reader.nextPage()" title="الصفحة التالية"><i class="ri-arrow-left-s-line"></i></button>
+                    
+                    <div class="toolbar-group" style="margin-right: auto;">
+                        <button class="icon-btn" id="jump-bookmark-btn" onclick="app.reader.jumpToBookmark()" title="العودة لعلامتي" style="display: none;"><i class="ri-bookmark-fill gold-text"></i></button>
                         <div class="divider"></div>
-                        <button class="icon-btn"><i class="ri-play-circle-line"></i></button>
-                        <button class="icon-btn"><i class="ri-settings-3-line"></i></button>
+                        <button class="icon-btn" onclick="app.reader.changeFontSize(-1)" title="تصغير الخط"><i class="ri-font-size" style="font-size: 0.9rem;"></i></button>
+                        <button class="icon-btn" onclick="app.reader.changeFontSize(1)" title="تكبير الخط"><i class="ri-font-size" style="font-size: 1.3rem;"></i></button>
+                        <button class="icon-btn" onclick="app.settings.toggleTheme()" title="تغيير المظهر"><i class="ri-contrast-drop-2-line"></i></button>
                     </div>
                 </div>
 
@@ -155,6 +156,10 @@
                     <div id="quran-page-content" class="quran-page">
                         <!-- Quran lines will be injected here -->
                         <div class="loading-spinner"></div>
+                    </div>
+                    
+                    <div id="quran-reader-actions" style="display: none; justify-content: center; width: 100%; max-width: 800px; margin-top: 40px; border-top: 1px solid var(--glass-border); padding-top: 30px;">
+                        <button class="btn-primary" onclick="app.reader.nextSurah()" style="font-size: 1.1rem; padding: 12px 40px; border-radius: 30px;">السورة التالية <i class="ri-arrow-left-line"></i></button>
                     </div>
                 </div>
             </section>
@@ -207,6 +212,27 @@
                     </div>
                 </div>
             </section>
+
+            <!-- Community Forum Page -->
+            <section id="page-community" class="page-section">
+                <div class="community-header glass-panel mb-2" style="text-align: center; padding: 20px;">
+                    <h2 class="gold-text"><i class="ri-discuss-line"></i> المنتدى المجتمعي</h2>
+                    <p style="color: var(--text-secondary); margin-top: 5px;">مساحة إيمانية لنشارك خواطرنا ونشجع بعضنا البعض.</p>
+                </div>
+                
+                <!-- Input Box -->
+                <div class="post-input-box glass-panel mb-2">
+                    <textarea id="post-text-input" class="glass-textarea" placeholder="بم تفكر؟ شارك بخاطرة، بآية أثرت بك، أو بتشجيع..." rows="3"></textarea>
+                    <div style="display: flex; justify-content: flex-end; margin-top: 10px;">
+                        <button class="btn-primary" onclick="app.community.publishPost()">نشر المشاركة <i class="ri-send-plane-fill"></i></button>
+                    </div>
+                </div>
+
+                <!-- Feed Container -->
+                <div id="community-feed" class="community-feed">
+                    <div class="loading-spinner"></div>
+                </div>
+            </section>
         </div>
     </main>
 
@@ -252,6 +278,7 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     
     <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script src="firebase-config.js"></script>
     <script src="app.js"></script>
 </body>
