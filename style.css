@@ -22,8 +22,8 @@
     
     /* الخطوط */
     --font-ui: 'Tajawal', sans-serif;
-    --font-quran: 'Amiri', serif;
-    --font-size-base: 2.2rem;
+    --font-quran: 'Amiri Quran', 'Amiri', serif;
+    --font-size-base: 2.1rem;
 }
 
 /* =========================================
@@ -455,44 +455,88 @@ button {
 }
 
 .quran-reader-container {
-    padding: 40px;
+    padding: 20px;
     min-height: 600px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M50 0L60 40L100 50L60 60L50 100L40 60L0 50L40 40Z" fill="rgba(201,168,76,0.03)"/></svg>') center center;
 }
 
+/* ==== صفحة المصحف الحرفية ==== */
 .quran-page {
     font-family: var(--font-quran);
-    max-width: 800px;
+    max-width: 760px;
+    width: 100%;
     text-align: justify;
-    text-align-last: center;
     direction: rtl;
-    line-height: 2.8;
+    unicode-bidi: embed;
+    line-height: 3;
+    /* تفعيل تشكيل الحروف والربط بينها */
+    font-feature-settings: "calt" 1, "clig" 1, "liga" 1, "rlig" 1, "kern" 1;
+    -webkit-font-feature-settings: "calt" 1, "clig" 1, "liga" 1, "rlig" 1;
+    text-rendering: optimizeLegibility;
+
+    /* شكل صفحة المصحف */
+    background: linear-gradient(160deg, #f5f0e0 0%, #ede5c8 40%, #e8ddba 100%);
+    color: #1a0f00;
+    padding: 50px 55px 55px 55px;
+    border-radius: 4px;
+    position: relative;
+
+    /* حد مصحفي مزدوج */
+    border: 3px solid #8B6914;
+    box-shadow:
+        0 0 0 9px #c8a84540,
+        inset 0 0 0 2px #8B691460,
+        0 20px 60px rgba(0,0,0,0.7),
+        0 5px 15px rgba(0,0,0,0.4);
+}
+
+/* الزخرفة الإسلامية في الزوايا */
+.quran-page::before {
+    content: '';
+    position: absolute;
+    inset: 8px;
+    border: 1.5px solid #8B691460;
+    border-radius: 2px;
+    pointer-events: none;
+}
+
+.quran-page::after {
+    content: '❧';
+    position: absolute;
+    top: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #8B6914;
+    font-size: 1.4rem;
+    opacity: 0.5;
 }
 
 .quran-word {
     font-size: var(--font-size-base);
-    color: var(--text-primary);
-    margin: 0 4px;
-    display: inline-block;
+    font-family: var(--font-quran);
+    color: #1a0f00;
+    display: inline;
+    letter-spacing: normal;
+    word-spacing: normal;
+    -webkit-font-smoothing: antialiased;
 }
 
 .ayah-end {
     display: inline-flex;
     justify-content: center;
     align-items: center;
-    width: 40px;
-    height: 40px;
-    background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 54 54"><path d="M27 0L33 11L45 11L41 21L50 30L41 39L45 49L33 49L27 60L21 49L9 49L13 39L4 30L13 21L9 11L21 11Z" fill="none" stroke="%23C9A84C" stroke-width="2"/></svg>') no-repeat center;
+    width: 38px;
+    height: 38px;
+    background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 54 54"><path d="M27 0L33 11L45 11L41 21L50 30L41 39L45 49L33 49L27 60L21 49L9 49L13 39L4 30L13 21L9 11L21 11Z" fill="none" stroke="%238B6914" stroke-width="2"/></svg>') no-repeat center;
     background-size: contain;
-    font-size: 1.2rem;
+    font-size: 1rem;
     font-family: var(--font-ui);
-    color: var(--gold-primary);
-    margin: 0 10px;
+    color: #8B6914;
+    margin: 0 8px;
     position: relative;
-    top: 5px;
+    top: 4px;
 }
 
 .ayah-end span {
@@ -500,14 +544,85 @@ button {
     top: -2px;
 }
 
+/* ==== \u062f\u0627\u062e\u0644 \u0635\u0641\u062d\u0629 \u0627\u0644\u0645\u0635\u062d\u0641 ==== */
+.quran-page .surah-header {
+    display: block;
+    width: 100%;
+    text-align: center;
+    font-family: var(--font-quran);
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #6B4C11;
+    padding: 8px 20px;
+    margin: 20px auto 5px;
+    border-top: 2px solid #8B691440;
+    border-bottom: 2px solid #8B691440;
+    letter-spacing: 0.1em;
+}
+
+.quran-page .bismillah {
+    display: block;
+    width: 100%;
+    text-align: center;
+    font-family: var(--font-quran);
+    font-size: 2rem;
+    color: #1a0f00;
+    margin: 10px 0 15px;
+    line-height: 2;
+}
+
+.quran-page .page-marker {
+    display: block;
+    width: 100%;
+    text-align: center;
+    font-family: var(--font-ui);
+    font-size: 0.8rem;
+    color: #8B6914;
+    border-top: 1px dashed #8B691450;
+    padding-top: 5px;
+    margin: 10px 0;
+    opacity: 0.7;
+}
+
+.quran-page .juz-marker {
+    display: block;
+    width: 100%;
+    text-align: center;
+    font-family: var(--font-ui);
+    font-size: 0.85rem;
+    color: #4a6741;
+    background: rgba(74, 103, 65, 0.1);
+    border: 1px solid rgba(74, 103, 65, 0.3);
+    border-radius: 6px;
+    padding: 5px 10px;
+    margin: 10px auto;
+    width: fit-content;
+}
+
+.quran-page .ayah-bookmark {
+    color: #8B6914;
+    background: transparent;
+    border: none;
+    font-size: 0.9rem;
+    cursor: pointer;
+    opacity: 0.5;
+    transition: 0.2s;
+    padding: 0 2px;
+    position: relative;
+    top: 4px;
+}
+.quran-page .ayah-bookmark:hover,
+.quran-page .ayah-bookmark.active { opacity: 1; color: #8B6914; }
+
 /* =========================================
-   التلوين ووضع التسميع (Hifz Modes)
+   \u0627\u0644\u062a\u0644\u0648\u064a\u0646 \u0648\u0648\u0636\u0639 \u0627\u0644\u062a\u0633\u0645\u064a\u0639 (Hifz Modes)
 ========================================= */
 
 .ayah-wrap {
     transition: background-color 0.3s ease;
     border-radius: 8px;
     padding: 0 5px;
+    cursor: pointer;
 }
 
 .ayah-wrap.status-strong {
@@ -542,7 +657,8 @@ button {
 }
 
 .quran-page.test-mode .quran-word:hover,
-.quran-page.test-mode .quran-word:active {
+.quran-page.test-mode .quran-word:active,
+.quran-page.test-mode .ayah-wrap.revealed .quran-word {
     filter: blur(0);
     opacity: 1;
 }
@@ -612,9 +728,13 @@ button {
 /* =========================================
    التجاوب (Responsive)
 ========================================= */
+.mobile-only { display: none; }
+
 @media (max-width: 900px) {
     .dashboard-grid { grid-template-columns: 1fr; }
     .sidebar { position: fixed; right: -300px; z-index: 100; transition: 0.3s; }
+    .sidebar.active { right: 0; }
+    .mobile-only { display: flex !important; }
 }
 
 /* =========================================
@@ -638,9 +758,21 @@ button {
     animation: zoomIn 0.3s ease;
 }
 
+/* Switch */
+.switch input { display: none; }
+.slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #3b4252; transition: .4s; border-radius: 34px; border: 1px solid var(--glass-border); }
+.slider:before { position: absolute; content: ""; height: 26px; width: 26px; left: 4px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
+input:checked + .slider { background-color: var(--gold-primary); }
+input:checked + .slider:before { transform: translateX(25px) scale(0.9); }
+
 @keyframes zoomIn {
     from { transform: scale(0.9); opacity: 0; }
     to { transform: scale(1); opacity: 1; }
+}
+
+@keyframes slideUp {
+    from { transform: translateY(100%); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
 }
 
 .glass-input {
@@ -1104,3 +1236,582 @@ select.quran-input option {
         padding: 5px;
     }
 }
+
+/* =========================================
+   Glass Select Dropdown
+========================================= */
+.glass-select {
+    background: rgba(0,0,0,0.35);
+    border: 1px solid var(--glass-border);
+    color: var(--text-primary);
+    padding: 10px 15px;
+    border-radius: 10px;
+    font-family: inherit;
+    font-size: 1rem;
+    outline: none;
+    transition: 0.3s;
+    cursor: pointer;
+    direction: rtl;
+    width: 100%;
+}
+.glass-select:focus { border-color: var(--gold-primary); background: rgba(0,0,0,0.5); }
+.glass-select option { background: #1a1a2e; color: var(--text-primary); padding: 8px; }
+
+#full-surah-player {
+    accent-color: var(--gold-primary);
+    height: 40px;
+}
+
+/* =========================================
+   الملف الشخصي (Profile Page)
+========================================= */
+
+/* --- البانر --- */
+.profile-banner-card {
+    position: relative;
+    overflow: hidden;
+    padding: 0;
+}
+
+.profile-banner-bg {
+    height: 150px;
+    background: linear-gradient(135deg, #0a1628 0%, #1B4332 45%, #0f1f3a 100%);
+    position: relative;
+    overflow: hidden;
+}
+
+.banner-pattern {
+    position: absolute;
+    inset: 0;
+    opacity: 0.12;
+    background-image:
+        repeating-linear-gradient(45deg, transparent, transparent 15px, rgba(201,168,76,0.4) 15px, rgba(201,168,76,0.4) 16px),
+        repeating-linear-gradient(-45deg, transparent, transparent 15px, rgba(27,67,50,0.5) 15px, rgba(27,67,50,0.5) 16px);
+}
+
+.banner-glow {
+    position: absolute;
+    width: 300px;
+    height: 300px;
+    border-radius: 50%;
+    background: var(--gold-primary);
+    filter: blur(100px);
+    opacity: 0.08;
+    top: -100px;
+    right: 10%;
+}
+
+.profile-banner-body {
+    display: flex;
+    align-items: flex-end;
+    gap: 22px;
+    padding: 0 30px 25px;
+    margin-top: -65px;
+    position: relative;
+    flex-wrap: wrap;
+}
+
+/* --- الصورة الشخصية --- */
+.profile-avatar-wrap {
+    position: relative;
+    flex-shrink: 0;
+}
+
+.profile-avatar-wrap img {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid var(--gold-primary);
+    box-shadow: 0 4px 25px rgba(0,0,0,0.7), 0 0 0 2px rgba(201,168,76,0.3);
+    transition: transform 0.3s ease;
+}
+
+.profile-avatar-wrap img:hover { transform: scale(1.03); }
+
+.avatar-camera-btn {
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+    background: linear-gradient(135deg, #CFB059, #B08D35);
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #0d1b2a;
+    font-size: 1rem;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+    transition: transform 0.2s;
+}
+.avatar-camera-btn:hover { transform: scale(1.1); }
+
+/* --- معلومات البانر --- */
+.profile-banner-info {
+    flex: 1;
+    padding-bottom: 8px;
+    min-width: 200px;
+}
+
+.profile-name-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 4px;
+}
+
+.profile-display-name {
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: var(--gold-primary);
+    text-shadow: 0 2px 12px rgba(201,168,76,0.3);
+}
+
+.profile-edit-name-btn {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid var(--glass-border);
+    color: var(--text-secondary);
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    transition: 0.2s;
+}
+.profile-edit-name-btn:hover { color: var(--gold-primary); border-color: var(--gold-primary); background: var(--gold-dim); }
+
+.profile-inline-edit {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 8px;
+    animation: fadeIn 0.2s ease;
+}
+
+.profile-inline-input {
+    background: rgba(0,0,0,0.3);
+    border: 1px solid var(--gold-primary);
+    color: white;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 1rem;
+    outline: none;
+    flex: 1;
+}
+
+.profile-inline-save, .profile-inline-cancel {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    transition: 0.2s;
+}
+.profile-inline-save { background: #2ecc71; color: #000; }
+.profile-inline-save:hover { background: #27ae60; }
+.profile-inline-cancel { background: rgba(255,255,255,0.1); color: var(--text-secondary); }
+.profile-inline-cancel:hover { background: rgba(231,76,60,0.3); color: #e74c3c; }
+
+.profile-country-text {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    margin-bottom: 4px;
+}
+
+.profile-bio-text {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    line-height: 1.5;
+    margin-bottom: 12px;
+    opacity: 0.8;
+}
+
+/* --- الإحصائيات السريعة في البانر --- */
+.profile-quick-stats {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-top: 8px;
+}
+
+.pqs-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.pqs-val {
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: var(--gold-primary);
+    line-height: 1;
+}
+
+.pqs-label {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    margin-top: 2px;
+}
+
+.pqs-sep {
+    width: 1px;
+    height: 30px;
+    background: var(--glass-border);
+}
+
+/* --- أزرار البانر --- */
+.profile-banner-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-self: flex-end;
+    padding-bottom: 5px;
+}
+
+.profile-share-btn {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid var(--glass-border);
+    color: var(--text-primary);
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    transition: 0.2s;
+}
+.profile-share-btn:hover { background: var(--gold-dim); color: var(--gold-primary); border-color: var(--gold-primary); }
+
+/* --- أقسام الملف الشخصي --- */
+.profile-section-card {
+    padding: 25px;
+}
+
+.profile-section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--glass-border);
+    padding-bottom: 12px;
+    margin-bottom: 20px;
+}
+
+.profile-section-header h3 {
+    font-size: 1.05rem;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* --- الشارات --- */
+.badge-count-chip {
+    background: var(--gold-dim);
+    color: var(--gold-primary);
+    border: 1px solid rgba(201,168,76,0.3);
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 700;
+}
+
+.badges-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 14px;
+}
+
+.badge-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 18px 10px;
+    border-radius: 16px;
+    background: rgba(0,0,0,0.2);
+    border: 1px solid var(--glass-border);
+    text-align: center;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.badge-item.earned {
+    background: linear-gradient(145deg, rgba(201,168,76,0.08), rgba(201,168,76,0.02));
+    border-color: rgba(201,168,76,0.3);
+}
+
+.badge-item.earned::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at top right, rgba(201,168,76,0.1), transparent 60%);
+}
+
+.badge-item.locked {
+    opacity: 0.4;
+    filter: grayscale(0.6);
+}
+
+.badge-item:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(0,0,0,0.3); }
+
+.badge-emoji {
+    font-size: 2.2rem;
+    margin-bottom: 8px;
+    line-height: 1;
+    display: block;
+}
+
+.badge-name {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+}
+
+.badge-desc {
+    font-size: 0.72rem;
+    color: var(--text-secondary);
+    line-height: 1.3;
+}
+
+.badge-item.earned .badge-name { color: var(--gold-primary); }
+
+.badge-earned-checkmark {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    background: #2ecc71;
+    color: #000;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.65rem;
+    font-weight: 700;
+}
+
+/* --- مخطط النشاط --- */
+.activity-chart-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.activity-chart {
+    display: grid;
+    grid-template-rows: repeat(5, 1fr);
+    grid-auto-flow: column;
+    gap: 5px;
+    width: 100%;
+    overflow-x: auto;
+    padding-bottom: 5px;
+}
+
+.activity-day {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.05);
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    position: relative;
+}
+
+.activity-day:hover {
+    transform: scale(1.3);
+    z-index: 5;
+    box-shadow: 0 4px 15px rgba(201,168,76,0.4);
+}
+
+.activity-day[data-level="0"] { background: rgba(255,255,255,0.04); }
+.activity-day[data-level="1"] { background: rgba(201,168,76,0.15); border-color: rgba(201,168,76,0.2); }
+.activity-day[data-level="2"] { background: rgba(201,168,76,0.35); border-color: rgba(201,168,76,0.4); }
+.activity-day[data-level="3"] { background: rgba(201,168,76,0.6); border-color: rgba(201,168,76,0.65); }
+.activity-day[data-level="4"] { background: rgba(201,168,76,0.85); border-color: rgba(201,168,76,0.9); }
+.activity-day[data-level="5"] { background: #C9A84C; border-color: #CFB059; box-shadow: 0 0 8px rgba(201,168,76,0.4); }
+
+.activity-day[data-today="true"] {
+    outline: 2px solid var(--gold-primary);
+    outline-offset: 1px;
+}
+
+.activity-legend {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    justify-content: flex-end;
+}
+
+.legend-dot {
+    width: 14px;
+    height: 14px;
+    border-radius: 4px;
+    border: 1px solid rgba(255,255,255,0.08);
+}
+
+/* --- شبكة الأسفل --- */
+.profile-bottom-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 20px;
+}
+
+/* --- نموذج التعديل --- */
+.profile-form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+.profile-form-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.profile-form-field label {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+/* --- بطاقة الدعوة --- */
+.profile-invite-card {
+    background: linear-gradient(145deg, rgba(46,204,113,0.05), rgba(27,67,50,0.1)) !important;
+    border-color: rgba(46,204,113,0.15) !important;
+}
+
+.invite-link-box {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    background: rgba(0,0,0,0.25);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    padding: 8px;
+}
+
+.invite-link-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    font-family: inherit;
+    font-size: 0.85rem;
+    outline: none;
+    text-overflow: ellipsis;
+    direction: ltr;
+    text-align: left;
+}
+
+.invite-copy-btn {
+    background: linear-gradient(135deg, #2ecc71, #27ae60);
+    color: #000;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    white-space: nowrap;
+    transition: 0.2s;
+    flex-shrink: 0;
+}
+.invite-copy-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(46,204,113,0.4); }
+
+.share-platform-btn {
+    padding: 8px 16px;
+    border-radius: 10px;
+    border: none;
+    font-family: inherit;
+    font-size: 0.9rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: 0.2s;
+}
+
+.whatsapp-btn {
+    background: rgba(37,211,102,0.15);
+    color: #25D366;
+    border: 1px solid rgba(37,211,102,0.3);
+}
+.whatsapp-btn:hover { background: rgba(37,211,102,0.25); transform: translateY(-1px); }
+
+.twitter-btn {
+    background: rgba(255,255,255,0.06);
+    color: var(--text-primary);
+    border: 1px solid var(--glass-border);
+}
+.twitter-btn:hover { background: rgba(255,255,255,0.1); transform: translateY(-1px); }
+
+/* --- صفوف الإحصائيات --- */
+.stat-row-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 14px;
+    background: rgba(0,0,0,0.2);
+    border-radius: 10px;
+    border: 1px solid var(--glass-border);
+    transition: 0.2s;
+}
+.stat-row-item:hover { border-color: rgba(201,168,76,0.2); background: rgba(0,0,0,0.3); }
+.stat-row-item span { display: flex; align-items: center; gap: 8px; color: var(--text-secondary); font-size: 0.95rem; }
+
+/* --- صفوف الخصوصية --- */
+.privacy-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+.privacy-row:last-child { border-bottom: none; }
+
+/* --- التجاوب للموبايل --- */
+@media (max-width: 900px) {
+    .profile-bottom-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .profile-form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .profile-banner-body {
+        padding: 0 15px 20px;
+    }
+
+    .profile-bottom-grid > *[style*="grid-column: 1 / -1"] {
+        grid-column: 1;
+    }
+
+    .profile-quick-stats {
+        gap: 10px;
+    }
+
+    .badges-grid {
+        grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+    }
+
+    .activity-chart {
+        grid-template-rows: repeat(3, 1fr);
+    }
+}
+

@@ -25,6 +25,9 @@ const app = {
         this.settings.init();
         this.reader.init();
         this.hifz.init();
+        this.audioPage.init();
+        this.analytics.init();
+        this.profile.init();
         
         // تهيئة المصادقة مع فايربيس
         this.initAuth();
@@ -42,6 +45,7 @@ const app = {
                     db.ref('users/' + user.uid + '/name').once('value').then(snap => {
                         if (snap.exists() && snap.val()) {
                             this.state.userName = snap.val();
+                            this.updateUserProfileDisplay();
                             this.loadProgress();
                         } else {
                             // إجبار المستخدم على إدخال اسمه
@@ -71,6 +75,7 @@ const app = {
             db.ref('users/' + this.state.currentUser.uid + '/name').set(input)
                 .then(() => {
                     document.getElementById('name-modal').style.display = 'none';
+                    this.updateUserProfileDisplay();
                     this.loadProgress();
                 });
         }
@@ -93,6 +98,29 @@ const app = {
     },
 
     // دالة التنقل بين الصفحات
+    toggleMobileSidebar() {
+        const sidebar = document.querySelector('.sidebar');
+        if (sidebar) {
+            sidebar.classList.toggle('active');
+        }
+    },
+
+    toggleNotifications() {
+        const menu = document.getElementById('notifications-menu');
+        if (menu) {
+            menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+        }
+    },
+
+    updateUserProfileDisplay() {
+        const nameDisplay = document.getElementById('topbar-user-name');
+        const avatarImg = document.getElementById('topbar-user-avatar');
+        if (nameDisplay && avatarImg && this.state.userName) {
+            nameDisplay.textContent = this.state.userName;
+            avatarImg.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(this.state.userName)}&background=C9A84C&color=0D1B2A&font-family=Tajawal`;
+        }
+    },
+
     navigateTo(pageId) {
         // إغلاق القائمة الجانبية في الهاتف (إن كانت مفتوحة)
         const sidebar = document.querySelector('.sidebar');
@@ -102,7 +130,7 @@ const app = {
             if(overlay) overlay.style.display = 'none';
         }
 
-        if (!['home', 'quran', 'khatmah', 'community', 'hifz'].includes(pageId)) {
+        if (!['home', 'quran', 'khatmah', 'community', 'hifz', 'audio', 'analytics', 'profile'].includes(pageId)) {
             alert('عذراً، هذه الميزة قيد التطوير وستتوفر قريباً!');
             return;
         }
@@ -129,6 +157,16 @@ const app = {
             this.khatmah.init();
         } else if (pageId === 'community') {
             this.community.init();
+        } else if (pageId === 'audio') {
+            // load first surah by default when visiting for first time
+            const player = document.getElementById('full-surah-player');
+            if (player && !player.src) {
+                app.audioPage.loadSurah();
+            }
+        } else if (pageId === 'analytics') {
+            app.analytics.init();
+        } else if (pageId === 'profile') {
+            app.profile.init();
         }
     },
 
@@ -205,6 +243,11 @@ const app = {
         // تحديث عدد الصفحات المقروءة للورد
         this.state.dailyProgress.readPages += 1;
         this.updateProgressBar();
+
+        // تتبع النشاط اليومي لمخطط الملف الشخصي
+        if (this.profile && typeof this.profile.trackTodayActivity === 'function') {
+            this.profile.trackTodayActivity(1);
+        }
 
         const progressData = {
             lastPage: pageRead,
@@ -287,8 +330,28 @@ const app = {
             document.getElementById('surah-select').addEventListener('change', (e) => {
                 if (e.target.value) {
                     this.loadSurah(parseInt(e.target.value));
+                    const juzSelect = document.getElementById('juz-select');
+                    if (juzSelect) juzSelect.value = '';
                 }
             });
+            // إعداد مستمع اختيار الجزء
+            const juzSelect = document.getElementById('juz-select');
+            if (juzSelect) {
+                juzSelect.innerHTML = '<option value="">اختيار الجزء...</option>';
+                for (let i = 1; i <= 30; i++) {
+                    const opt = document.createElement('option');
+                    opt.value = i;
+                    opt.textContent = `الجزء ${i}`;
+                    juzSelect.appendChild(opt);
+                }
+                juzSelect.addEventListener('change', (e) => {
+                    if (e.target.value) {
+                        this.loadJuz(parseInt(e.target.value));
+                        const surahSelect = document.getElementById('surah-select');
+                        if (surahSelect) surahSelect.value = '';
+                    }
+                });
+            }
             this.setupObserver();
         },
         
@@ -339,6 +402,14 @@ const app = {
                     option.textContent = `سورة ${surah.name}`;
                     select.appendChild(option);
                 });
+
+                // تعبئة قائمة سور صفحة الاستماع أيضاً
+                const audioSelect = document.getElementById('audio-page-surah');
+                if (audioSelect) {
+                    audioSelect.innerHTML = app.state.surahs.map(surah =>
+                        `<option value="${surah.number}">سورة ${surah.name}</option>`
+                    ).join('');
+                }
             } catch (err) {
                 console.error("خطأ في جلب بيانات السور:", err);
             }
@@ -411,11 +482,11 @@ const app = {
                     const words = text.split(' ');
                     html += `<span id="ayah-txt-${surahNumber}-${ayah.numberInSurah}" class="ayah-wrap" onclick="app.hifz.handleAyahClick(${surahNumber}, ${ayah.numberInSurah})">`;
                     words.forEach(word => {
-                        html += `<span class="quran-word">${word}</span>`;
+                        html += `<span class="quran-word">${word}</span> `;
                     });
 
                     const isActiveBookmark = (app.state.bookmarkedSurah === surahNumber && app.state.bookmarkedAyah === ayah.numberInSurah) ? 'active' : '';
-                    html += `<span class="ayah-end"><span>${this.toArabicNumbers(ayah.numberInSurah)}</span></span>`;
+                    html += `<span class="ayah-end" onclick="app.hifz.revealAyah(event, ${surahNumber}, ${ayah.numberInSurah})" style="cursor: pointer;"><span>${this.toArabicNumbers(ayah.numberInSurah)}</span></span>`;
                     html += `<button class="ayah-bookmark ${isActiveBookmark}" id="bookmark-${surahNumber}-${ayah.numberInSurah}" onclick="app.reader.toggleBookmark(${surahNumber}, ${ayah.numberInSurah})" title="حفظ كعلامة"><i class="ri-bookmark-fill"></i></button>`;
                     html += `</span>`;
                 });
@@ -512,11 +583,11 @@ const app = {
                     const words = text.split(' ');
                     html += `<span id="ayah-txt-${surahNumber}-${ayah.numberInSurah}" class="ayah-wrap" onclick="app.hifz.handleAyahClick(${surahNumber}, ${ayah.numberInSurah})">`;
                     words.forEach(word => {
-                        html += `<span class="quran-word">${word}</span>`;
+                        html += `<span class="quran-word">${word}</span> `;
                     });
 
                     const isActiveBookmark = (app.state.bookmarkedSurah === surahNumber && app.state.bookmarkedAyah === ayah.numberInSurah) ? 'active' : '';
-                    html += `<span class="ayah-end"><span>${this.toArabicNumbers(ayah.numberInSurah)}</span></span>`;
+                    html += `<span class="ayah-end" onclick="app.hifz.revealAyah(event, ${surahNumber}, ${ayah.numberInSurah})" style="cursor: pointer;"><span>${this.toArabicNumbers(ayah.numberInSurah)}</span></span>`;
                     html += `<button class="ayah-bookmark ${isActiveBookmark}" id="bookmark-${surahNumber}-${ayah.numberInSurah}" onclick="app.reader.toggleBookmark(${surahNumber}, ${ayah.numberInSurah})" title="حفظ كعلامة"><i class="ri-bookmark-fill"></i></button>`;
                     html += `</span>`;
                 });
@@ -644,6 +715,110 @@ const app = {
         toArabicNumbers(num) {
             const arabicNumbers = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
             return num.toString().split('').map(char => arabicNumbers[parseInt(char)]).join('');
+        },
+
+        currentActionSheetSurah: null,
+        currentActionSheetAyah: null,
+
+        async openAyahActionSheet(surahNum, ayahNum) {
+            this.currentActionSheetSurah = surahNum;
+            this.currentActionSheetAyah = ayahNum;
+            
+            const sheet = document.getElementById('ayah-action-sheet');
+            sheet.style.display = 'flex';
+            document.getElementById('action-sheet-loading').style.display = 'block';
+            document.getElementById('action-sheet-content').style.display = 'none';
+
+            const surah = app.state.surahs.find(s => parseInt(s.number) === parseInt(surahNum));
+            document.getElementById('action-sheet-title').innerText = `سورة ${surah ? surah.name : ''} - آية ${this.toArabicNumbers(ayahNum)}`;
+
+            this.loadActionSheetData();
+        },
+
+        async loadActionSheetData() {
+            const surahNum = this.currentActionSheetSurah;
+            const ayahNum = this.currentActionSheetAyah;
+            if (!surahNum || !ayahNum) return;
+
+            const reciterSelect = document.getElementById('action-sheet-reciter');
+            const tafsirSelect = document.getElementById('action-sheet-tafsir');
+            
+            const reciter = reciterSelect ? reciterSelect.value : 'ar.alafasy';
+            const tafsir = tafsirSelect ? tafsirSelect.value : 'ar.muyassar';
+
+            try {
+                const audio = document.getElementById('ayah-audio-player');
+                if (audio) {
+                    audio.pause();
+                    document.getElementById('ayah-play-icon').className = 'ri-play-fill';
+                }
+
+                document.getElementById('action-sheet-loading').style.display = 'block';
+                document.getElementById('action-sheet-content').style.display = 'none';
+
+                const res = await fetch(`https://api.alquran.cloud/v1/ayah/${surahNum}:${ayahNum}/editions/quran-uthmani,${tafsir},${reciter}`);
+                const data = await res.json();
+                
+                const tafsirText = data.data[1].text;
+                const audioUrl = data.data[2].audio;
+                const tafsirName = data.data[1].edition.name;
+                const reciterName = data.data[2].edition.name;
+
+                document.getElementById('ayah-tafsir-text').innerText = tafsirText;
+                document.getElementById('action-sheet-tafsir-name').innerHTML = `<i class="ri-book-open-fill"></i> ${tafsirName}`;
+                
+                document.getElementById('action-sheet-reciter-name').innerText = `تلاوة ${reciterName}`;
+                document.getElementById('ayah-audio-player').src = audioUrl;
+
+                document.getElementById('action-sheet-loading').style.display = 'none';
+                document.getElementById('action-sheet-content').style.display = 'flex';
+                
+                this.setupAudioListeners();
+
+            } catch(e) {
+                console.error("Error loading action sheet:", e);
+                document.getElementById('action-sheet-loading').innerHTML = '<p style="color:var(--danger); margin-top:15px;">حدث خطأ في تحميل البيانات. يرجى التأكد من اتصالك.</p>';
+            }
+        },
+
+        changeActionSheetOptions() {
+            this.loadActionSheetData();
+        },
+
+        toggleAyahAudio() {
+            const audio = document.getElementById('ayah-audio-player');
+            const icon = document.getElementById('ayah-play-icon');
+            if (audio.paused) {
+                audio.play();
+                icon.className = 'ri-pause-fill';
+            } else {
+                audio.pause();
+                icon.className = 'ri-play-fill';
+            }
+        },
+
+        setupAudioListeners() {
+            const audio = document.getElementById('ayah-audio-player');
+            audio.ontimeupdate = () => {
+                const percent = (audio.currentTime / audio.duration) * 100 || 0;
+                document.getElementById('audio-progress-bar').style.width = percent + '%';
+                document.getElementById('audio-current-time').innerText = app.reader.formatTime(audio.currentTime);
+                if (audio.duration) {
+                    document.getElementById('audio-duration').innerText = app.reader.formatTime(audio.duration);
+                }
+            };
+            audio.onended = () => {
+                document.getElementById('ayah-play-icon').className = 'ri-play-fill';
+                document.getElementById('audio-progress-bar').style.width = '0%';
+                document.getElementById('audio-current-time').innerText = '00:00';
+            };
+        },
+
+        formatTime(seconds) {
+            if (isNaN(seconds)) return "00:00";
+            const m = Math.floor(seconds / 60);
+            const s = Math.floor(seconds % 60);
+            return (m < 10 ? "0" : "") + m + ":" + (s < 10 ? "0" : "") + s;
         }
     },
 
@@ -1274,28 +1449,38 @@ const app = {
             }
         },
 
-        handleAyahClick(surahNum, ayahNum) {
-            if (!this.isColorMode) return;
-            
-            const key = `${Math.floor(surahNum)}-${Math.floor(ayahNum)}`;
-            const currentStatus = this.savedAyahs[key];
-            let nextStatus = '';
-            
-            // دورة الألوان: لا يوجد -> strong -> learning -> weak -> لا يوجد
-            if (!currentStatus) nextStatus = 'strong';
-            else if (currentStatus === 'strong') nextStatus = 'learning';
-            else if (currentStatus === 'learning') nextStatus = 'weak';
-            else if (currentStatus === 'weak') nextStatus = null;
-            
-            if(nextStatus) {
-                this.savedAyahs[key] = nextStatus;
-            } else {
-                delete this.savedAyahs[key];
+        revealAyah(event, surahNum, ayahNum) {
+            if (this.isTestMode) {
+                event.stopPropagation();
+                const el = document.getElementById(`ayah-txt-${surahNum}-${ayahNum}`);
+                if (el) el.classList.toggle('revealed');
             }
-            
-            this.applyColorToAyah(surahNum, ayahNum);
-            this.saveToFirebase();
-            this.updateDashboard();
+        },
+
+        handleAyahClick(surahNum, ayahNum) {
+            if (this.isColorMode) {
+                const key = `${Math.floor(surahNum)}-${Math.floor(ayahNum)}`;
+                const currentStatus = this.savedAyahs[key];
+                let nextStatus = '';
+                
+                // دورة الألوان: لا يوجد -> strong -> learning -> weak -> لا يوجد
+                if (!currentStatus) nextStatus = 'strong';
+                else if (currentStatus === 'strong') nextStatus = 'learning';
+                else if (currentStatus === 'learning') nextStatus = 'weak';
+                else if (currentStatus === 'weak') nextStatus = null;
+                
+                if(nextStatus) {
+                    this.savedAyahs[key] = nextStatus;
+                } else {
+                    delete this.savedAyahs[key];
+                }
+                
+                this.applyColorToAyah(surahNum, ayahNum);
+                this.saveToFirebase();
+                this.updateDashboard();
+            } else if (!this.isTestMode) {
+                app.reader.openAyahActionSheet(surahNum, ayahNum);
+            }
         },
 
         applyColorToAyah(surahNum, ayahNum) {
@@ -1553,6 +1738,595 @@ const app = {
                 btn.classList.remove('test-mode-active');
                 cont.classList.remove('test-mode');
             }
+        }
+    },
+
+    audioPage: {
+        init() {
+            const surahSelect = document.getElementById('audio-page-surah');
+            if(surahSelect && app.state.surahs && app.state.surahs.length > 0) {
+                surahSelect.innerHTML = app.state.surahs.map(s => 
+                    `<option value="${s.number}">سورة ${s.name}</option>`
+                ).join('');
+            }
+        },
+        loadSurah() {
+            const surahSelect = document.getElementById('audio-page-surah');
+            const reciterSelect = document.getElementById('audio-page-reciter');
+            if(!surahSelect || !reciterSelect) return;
+            
+            const surahNum = surahSelect.value;
+            const reciter = reciterSelect.value;
+            
+            const surahName = surahSelect.options[surahSelect.selectedIndex].text;
+            document.getElementById('audio-page-title').innerText = `${surahName}`;
+
+            const player = document.getElementById('full-surah-player');
+            player.src = `https://cdn.islamic.network/quran/audio-surah/128/${reciter}/${surahNum}.mp3`;
+            player.play().catch(e => console.log('Autoplay prevented', e));
+        }
+    },
+
+    analytics: {
+        init() {
+            const pagesRead = localStorage.getItem('quran_pages_read') || 0;
+            const streak = localStorage.getItem('quran_streak_days') || 0;
+            
+            const pagesEl = document.getElementById('analytics-pages-count');
+            const streakEl = document.getElementById('analytics-streak');
+            
+            if(pagesEl) pagesEl.innerText = pagesRead;
+            if(streakEl) streakEl.innerText = streak + ' يوم';
+            
+            const hifzToggle = document.getElementById('hifz-tester-toggle');
+            if(hifzToggle) {
+                const isTesterOn = localStorage.getItem('hifz_tester_on') === 'true';
+                hifzToggle.checked = isTesterOn;
+                this.toggleHifzTester(true);
+            }
+        },
+
+        toggleHifzTester(fromInit = false) {
+            const toggle = document.getElementById('hifz-tester-toggle');
+            const container = document.getElementById('hifz-test-container');
+            if(!toggle || !container) return;
+            
+            if(!fromInit) {
+                localStorage.setItem('hifz_tester_on', toggle.checked);
+            }
+            
+            if(toggle.checked) {
+                container.style.display = 'block';
+                this.generateNextTest();
+            } else {
+                container.style.display = 'none';
+            }
+        },
+
+        async generateNextTest() {
+            const ayahEl = document.getElementById('hifz-test-ayah');
+            ayahEl.innerHTML = '<div class="loading-spinner" style="width:20px;height:20px;margin:auto;"></div>';
+            
+            const randomSurah = Math.floor(Math.random() * 114) + 1;
+            const surahDetails = app.state.surahs.find(s => parseInt(s.number) === randomSurah);
+            if(!surahDetails) return;
+            const randomAyah = Math.floor(Math.random() * surahDetails.numberOfAyahs) + 1;
+            
+            try {
+                const res = await fetch(`https://api.alquran.cloud/v1/ayah/${randomSurah}:${randomAyah}/quran-uthmani`);
+                const data = await res.json();
+                
+                const ayahText = data.data.text;
+                const words = ayahText.split(' ');
+                const obscured = words.map((w, i) => {
+                    if(i > 0 && Math.random() > 0.6) {
+                        return '<span style="background:var(--glass-border); color:transparent; border-radius:4px; padding:0 5px; cursor:pointer; transition: all 0.3s;" onclick="this.style.color=\'var(--text-primary)\';this.style.background=\'transparent\'">.....</span>';
+                    }
+                    return w;
+                }).join('  ');
+                
+                ayahEl.innerHTML = `<div><span style="font-size:0.9rem; color:var(--text-secondary); display:block; margin-bottom:15px;">سورة ${surahDetails.name} - الآية ${randomAyah}</span>${obscured}</div>`;
+            } catch(e) {
+                ayahEl.innerHTML = 'تعذر تحميل الآية. تأكد من اتصالك بالإنترنت.';
+            }
+        }
+    },
+
+    profile: {
+        data: {},
+
+        // تعريف الشارات
+        BADGES: [
+            {
+                id: 'first_step',
+                emoji: '🌟',
+                name: 'أول خطوة',
+                desc: 'قرأت لأول مرة',
+                check: (stats) => stats.totalPages >= 1
+            },
+            {
+                id: 'streak_3',
+                emoji: '🔥',
+                name: '3 أيام متتالية',
+                desc: 'حافظت على وردك 3 أيام',
+                check: (stats) => stats.streakDays >= 3
+            },
+            {
+                id: 'streak_7',
+                emoji: '🏆',
+                name: 'أسبوع كامل',
+                desc: 'استمريت 7 أيام متتالية',
+                check: (stats) => stats.streakDays >= 7
+            },
+            {
+                id: 'streak_30',
+                emoji: '👑',
+                name: 'شهر من الالتزام',
+                desc: 'استمريت 30 يوماً متتالياً',
+                check: (stats) => stats.streakDays >= 30
+            },
+            {
+                id: 'pages_50',
+                emoji: '📖',
+                name: '50 صفحة',
+                desc: 'أتممت 50 صفحة من القرآن',
+                check: (stats) => stats.totalPages >= 50
+            },
+            {
+                id: 'pages_100',
+                emoji: '📚',
+                name: 'مئة صفحة',
+                desc: 'وصلت إلى 100 صفحة مقروءة',
+                check: (stats) => stats.totalPages >= 100
+            },
+            {
+                id: 'memorizer',
+                emoji: '🧠',
+                name: 'حافظ مبتدئ',
+                desc: 'حفظت أول 10 آيات',
+                check: (stats) => stats.hifzCount >= 10
+            },
+            {
+                id: 'group_member',
+                emoji: '👥',
+                name: 'روح الجماعة',
+                desc: 'انضممت لختمة جماعية',
+                check: (stats) => stats.joinedKhatmah === true
+            },
+            {
+                id: 'community_voice',
+                emoji: '💬',
+                name: 'صوت المجتمع',
+                desc: 'شاركت في المنتدى',
+                check: (stats) => stats.communityPosts >= 1
+            },
+            {
+                id: 'profile_complete',
+                emoji: '✨',
+                name: 'ملف مكتمل',
+                desc: 'أكملت بيانات ملفك الشخصي',
+                check: (stats) => stats.profileComplete === true
+            }
+        ],
+
+        init() {
+            this.loadProfile();
+        },
+
+        // تتبع نشاط اليوم (يُستدعى من saveProgress)
+        trackTodayActivity(pagesCount = 1) {
+            const today = new Date().toISOString().split('T')[0];
+            const saved = localStorage.getItem('quran_daily_activity');
+            const activity = saved ? JSON.parse(saved) : {};
+            activity[today] = (activity[today] || 0) + pagesCount;
+            localStorage.setItem('quran_daily_activity', JSON.stringify(activity));
+        },
+
+        // جلب بيانات الإحصائيات الفعلية
+        getStats() {
+            const progress = JSON.parse(localStorage.getItem('quran_progress') || '{}');
+            const hifzData = JSON.parse(localStorage.getItem('quran_hifz') || '{}');
+            const profileData = JSON.parse(localStorage.getItem('quran_profile') || '{}');
+            const activityData = JSON.parse(localStorage.getItem('quran_daily_activity') || '{}');
+            const communityPosts = parseInt(localStorage.getItem('quran_community_posts') || '0');
+            const khatmahJoined = localStorage.getItem('quran_khatmah_joined') === 'true';
+
+            // حساب الأيام المتتالية
+            let streakDays = 0;
+            const today = new Date();
+            for (let i = 0; i < 365; i++) {
+                const d = new Date(today);
+                d.setDate(d.getDate() - i);
+                const key = d.toISOString().split('T')[0];
+                if (activityData[key] && activityData[key] > 0) {
+                    streakDays++;
+                } else if (i > 0) {
+                    break;
+                }
+            }
+
+            // حساب آيات الحفظ
+            const hifzCount = Object.keys(hifzData).length;
+
+            // التحقق من اكتمال الملف
+            const profileComplete = !!(profileData.displayName && profileData.country && profileData.bio);
+
+            return {
+                totalPages: progress.readPages || 0,
+                streakDays,
+                hifzCount,
+                joinedKhatmah: khatmahJoined,
+                communityPosts,
+                profileComplete,
+                activity: activityData
+            };
+        },
+
+        loadProfile() {
+            const saved = localStorage.getItem('quran_profile');
+            if (saved) {
+                this.data = JSON.parse(saved);
+            }
+
+            const d = this.data;
+            const stats = this.getStats();
+
+            // --- تعبئة النموذج ---
+            const setVal = (id, val) => { const el = document.getElementById(id); if (el && val != null) el.value = val; };
+            setVal('profile-display-name', d.displayName);
+            setVal('profile-full-name', d.fullName);
+            setVal('profile-country', d.country);
+            setVal('profile-age', d.age);
+            setVal('profile-bio', d.bio);
+
+            const pubToggle = document.getElementById('privacy-public');
+            const msgToggle = document.getElementById('privacy-messages');
+            if (pubToggle && d.privacyPublic !== undefined) pubToggle.checked = d.privacyPublic;
+            if (msgToggle && d.privacyMessages !== undefined) msgToggle.checked = d.privacyMessages;
+
+            // --- تحديث البانر ---
+            const displayName = d.displayName || app.state.userName || 'مستخدم';
+            const setHTML = (id, val) => { const el = document.getElementById(id); if (el) el.innerHTML = val; };
+            const setText = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+
+            setText('profile-name-display', displayName);
+            setHTML('profile-country-display', `<i class="ri-map-pin-2-line"></i> ${d.country || '—'}`);
+
+            const bioDisplay = document.getElementById('profile-bio-display');
+            if (bioDisplay) bioDisplay.textContent = d.bio || '';
+
+            const input = document.getElementById('profile-inline-name-input');
+            if (input) input.value = displayName;
+
+            // --- الصورة ---
+            const avatarEl = document.getElementById('profile-avatar-display');
+            if (avatarEl) {
+                avatarEl.src = d.photoUrl
+                    ? d.photoUrl
+                    : `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=C9A84C&color=0D1B2A&size=120&bold=true`;
+            }
+
+            // --- إحصائيات سريعة (البانر) ---
+            setText('pqs-pages', stats.totalPages);
+            setText('pqs-streak', stats.streakDays);
+
+            // --- الإحصائيات التفصيلية ---
+            setText('profile-stat-pages', stats.totalPages);
+            const el = document.getElementById('profile-stat-streak');
+            if (el) el.textContent = stats.streakDays + ' يوم';
+            const joinDate = d.joinDate || new Date().toLocaleDateString('ar-SA');
+            setText('profile-stat-joined', joinDate);
+
+            // --- رابط الدعوة ---
+            this.generateInviteLink();
+
+            // --- الشارات ---
+            this.renderBadges(stats);
+
+            // --- مخطط النشاط ---
+            this.renderActivityChart(stats.activity);
+
+            // --- الـ Topbar ---
+            app.updateUserProfileDisplay();
+        },
+
+        // ======= نظام الشارات =======
+        renderBadges(stats) {
+            const grid = document.getElementById('badges-grid');
+            if (!grid) return;
+
+            const earnedBadgeIds = JSON.parse(localStorage.getItem('quran_earned_badges') || '[]');
+            let earnedCount = 0;
+            let html = '';
+
+            this.BADGES.forEach(badge => {
+                const isEarned = badge.check(stats) || earnedBadgeIds.includes(badge.id);
+
+                if (isEarned && !earnedBadgeIds.includes(badge.id)) {
+                    earnedBadgeIds.push(badge.id);
+                    localStorage.setItem('quran_earned_badges', JSON.stringify(earnedBadgeIds));
+                    // إشعار لأول مرة
+                    setTimeout(() => this.showBadgeToast(badge), 300);
+                }
+
+                if (isEarned) earnedCount++;
+
+                html += `
+                <div class="badge-item ${isEarned ? 'earned' : 'locked'}" title="${badge.desc}">
+                    ${isEarned ? '<div class="badge-earned-checkmark">✓</div>' : ''}
+                    <span class="badge-emoji">${badge.emoji}</span>
+                    <span class="badge-name">${badge.name}</span>
+                    <span class="badge-desc">${badge.desc}</span>
+                </div>`;
+            });
+
+            grid.innerHTML = html;
+
+            // عداد الشارات
+            const chip = document.getElementById('badge-count-chip');
+            if (chip) chip.textContent = `${earnedCount} / ${this.BADGES.length}`;
+            const pqsBadges = document.getElementById('pqs-badges');
+            if (pqsBadges) pqsBadges.textContent = earnedCount;
+        },
+
+        showBadgeToast(badge) {
+            const toast = document.createElement('div');
+            toast.style.cssText = `
+                position:fixed; bottom:30px; left:50%; transform:translateX(-50%) translateY(80px);
+                background: linear-gradient(135deg, #1B4332, #0d1b2a);
+                border: 1px solid var(--gold-primary);
+                color:#fff; padding:14px 24px; border-radius:16px;
+                font-size:1rem; z-index:99999;
+                box-shadow:0 8px 30px rgba(0,0,0,0.6), 0 0 0 1px rgba(201,168,76,0.3);
+                display:flex; align-items:center; gap:12px;
+                transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1), opacity 0.4s;
+                opacity: 0;
+            `;
+            toast.innerHTML = `<span style="font-size:2rem;">${badge.emoji}</span><div><p style="font-weight:700;color:var(--gold-primary)">شارة جديدة! 🎉</p><p style="font-size:0.9rem;opacity:0.8;">${badge.name}</p></div>`;
+            document.body.appendChild(toast);
+
+            requestAnimationFrame(() => {
+                toast.style.transform = 'translateX(-50%) translateY(0)';
+                toast.style.opacity = '1';
+            });
+
+            setTimeout(() => {
+                toast.style.transform = 'translateX(-50%) translateY(80px)';
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 400);
+            }, 3500);
+        },
+
+        // ======= مخطط النشاط =======
+        renderActivityChart(activityData) {
+            const chart = document.getElementById('activity-chart');
+            if (!chart) return;
+
+            const today = new Date();
+            const days = [];
+            let totalActivePages = 0;
+
+            // آخر 30 يوماً
+            for (let i = 29; i >= 0; i--) {
+                const d = new Date(today);
+                d.setDate(d.getDate() - i);
+                const key = d.toISOString().split('T')[0];
+                const pages = activityData[key] || 0;
+                totalActivePages += pages;
+                days.push({
+                    date: key,
+                    pages,
+                    isToday: i === 0,
+                    label: d.toLocaleDateString('ar-SA', { month: 'short', day: 'numeric' })
+                });
+            }
+
+            // تحديد مستوى اللون
+            const maxPages = Math.max(...days.map(d => d.pages), 1);
+            const getLevel = (pages) => {
+                if (pages === 0) return 0;
+                const ratio = pages / maxPages;
+                if (ratio <= 0.2) return 1;
+                if (ratio <= 0.4) return 2;
+                if (ratio <= 0.6) return 3;
+                if (ratio <= 0.8) return 4;
+                return 5;
+            };
+
+            chart.innerHTML = days.map(d => `
+                <div class="activity-day"
+                    data-level="${getLevel(d.pages)}"
+                    ${d.isToday ? 'data-today="true"' : ''}
+                    title="${d.label}: ${d.pages} صفحة">
+                </div>
+            `).join('');
+
+            // ملخص النشاط
+            const activeDays = days.filter(d => d.pages > 0).length;
+            const totalLabel = document.getElementById('activity-total-label');
+            if (totalLabel) {
+                totalLabel.textContent = `${activeDays} يوم نشط | ${totalActivePages} صفحة مقروءة`;
+            }
+        },
+
+        // ======= رابط الدعوة =======
+        generateInviteLink() {
+            const user = app.state.currentUser;
+            const uid = user ? user.uid.slice(0, 8) : 'khatmah';
+            const link = `${window.location.origin}${window.location.pathname}?ref=${uid}`;
+            const input = document.getElementById('invite-link-input');
+            if (input) input.value = link;
+            return link;
+        },
+
+        copyInviteLink() {
+            const link = this.generateInviteLink();
+            navigator.clipboard.writeText(link).then(() => {
+                const btn = document.getElementById('invite-copy-btn');
+                if (btn) {
+                    const orig = btn.innerHTML;
+                    btn.innerHTML = '<i class="ri-check-line"></i> تم النسخ!';
+                    btn.style.background = 'linear-gradient(135deg, #27ae60, #1e8449)';
+                    setTimeout(() => { btn.innerHTML = orig; btn.style.background = ''; }, 2000);
+                }
+            }).catch(() => {
+                // Fallback
+                const input = document.getElementById('invite-link-input');
+                if (input) { input.select(); document.execCommand('copy'); }
+            });
+        },
+
+        shareViaWhatsApp() {
+            const name = this.data.displayName || app.state.userName || 'أنا';
+            const link = this.generateInviteLink();
+            const text = `السلام عليكم 🌙\nأدعوك للانضمام معي في تطبيق ختمة للقرآن الكريم.\nانضم الآن: ${link}\n#ختمة #قرآن`;
+            window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+        },
+
+        shareViaTwitter() {
+            const link = this.generateInviteLink();
+            const text = `أقرأ القرآن الكريم مع تطبيق ختمة 📖 انضم معي في رحلة القرآن!\n${link}\n#ختمة #قرآن`;
+            window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`, '_blank');
+        },
+
+        // ======= تعديل الاسم المضمّن =======
+        toggleInlineEdit() {
+            const editDiv = document.getElementById('profile-inline-edit');
+            const nameRow = document.querySelector('.profile-name-row');
+            if (!editDiv || !nameRow) return;
+
+            const isVisible = editDiv.style.display !== 'none';
+            editDiv.style.display = isVisible ? 'none' : 'flex';
+            if (nameRow) nameRow.style.display = isVisible ? 'flex' : 'none';
+
+            if (!isVisible) {
+                const input = document.getElementById('profile-inline-name-input');
+                if (input) {
+                    input.value = document.getElementById('profile-name-display')?.textContent || '';
+                    input.focus();
+                }
+            }
+        },
+
+        saveInlineName() {
+            const input = document.getElementById('profile-inline-name-input');
+            if (!input) return;
+            const name = input.value.trim();
+            if (!name) return;
+
+            // تحديث الحالة
+            app.state.userName = name;
+            this.data.displayName = name;
+
+            // حفظ في localStorage
+            const saved = localStorage.getItem('quran_profile');
+            const profileData = saved ? JSON.parse(saved) : {};
+            profileData.displayName = name;
+            localStorage.setItem('quran_profile', JSON.stringify(profileData));
+            this.data = profileData;
+
+            // حفظ في Firebase
+            if (app.state.currentUser && typeof db !== 'undefined') {
+                db.ref('users/' + app.state.currentUser.uid + '/name').set(name);
+                db.ref('users/' + app.state.currentUser.uid + '/profile').update({ displayName: name });
+            }
+
+            // تحديث الواجهة
+            const nameDisplay = document.getElementById('profile-name-display');
+            if (nameDisplay) nameDisplay.textContent = name;
+            this.toggleInlineEdit();
+            app.updateUserProfileDisplay();
+
+            // تحديث حقل النموذج أيضاً
+            const formInput = document.getElementById('profile-display-name');
+            if (formInput) formInput.value = name;
+
+            this.showSuccessToast('تم تحديث الاسم بنجاح');
+        },
+
+        // ======= حفظ الملف الكامل =======
+        saveProfile() {
+            const btn = document.getElementById('profile-save-btn');
+            if (btn) {
+                btn.innerHTML = '<div class="loading-spinner" style="width:18px;height:18px;border-width:2px;margin:0 auto;"></div>';
+                btn.disabled = true;
+            }
+
+            const getVal = (id) => { const el = document.getElementById(id); return el ? el.value.trim() : ''; };
+
+            const displayName = getVal('profile-display-name') || app.state.userName || '';
+            this.data = {
+                ...this.data,
+                displayName,
+                fullName: getVal('profile-full-name'),
+                country: getVal('profile-country'),
+                age: getVal('profile-age'),
+                bio: getVal('profile-bio'),
+                privacyPublic: document.getElementById('privacy-public')?.checked ?? true,
+                privacyMessages: document.getElementById('privacy-messages')?.checked ?? true,
+                joinDate: this.data.joinDate || new Date().toLocaleDateString('ar-SA')
+            };
+
+            localStorage.setItem('quran_profile', JSON.stringify(this.data));
+
+            if (app.state.currentUser && typeof db !== 'undefined') {
+                db.ref('users/' + app.state.currentUser.uid + '/profile').set(this.data)
+                    .catch(e => console.error('Error saving profile:', e));
+            }
+
+            if (displayName) {
+                app.state.userName = displayName;
+                app.updateUserProfileDisplay();
+            }
+
+            setTimeout(() => {
+                if (btn) {
+                    btn.innerHTML = '<i class="ri-save-3-line"></i> حفظ الملف';
+                    btn.disabled = false;
+                }
+                this.loadProfile();
+                this.showSuccessToast('✅ تم حفظ الملف الشخصي بنجاح');
+            }, 600);
+        },
+
+        showSuccessToast(msg) {
+            const toast = document.createElement('div');
+            toast.style.cssText = `
+                position:fixed; bottom:30px; left:50%; transform:translateX(-50%);
+                background:linear-gradient(135deg,#1B4332,#2ecc71);
+                color:#fff; padding:13px 28px; border-radius:30px;
+                font-size:1rem; z-index:9999;
+                box-shadow:0 4px 20px rgba(0,0,0,0.5);
+                animation: slideUpFade 0.35s ease forwards;
+            `;
+            toast.textContent = msg;
+
+            const style = document.createElement('style');
+            style.textContent = `@keyframes slideUpFade { from { opacity:0; transform:translateX(-50%) translateY(20px); } to { opacity:1; transform:translateX(-50%) translateY(0); } }`;
+            document.head.appendChild(style);
+
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 2800);
+        },
+
+        handlePhotoUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const photoUrl = e.target.result;
+                this.data.photoUrl = photoUrl;
+                const avatarEl = document.getElementById('profile-avatar-display');
+                if (avatarEl) avatarEl.src = photoUrl;
+                const topBar = document.getElementById('topbar-user-avatar');
+                if (topBar) topBar.src = photoUrl;
+                // حفظ الصورة
+                const saved = localStorage.getItem('quran_profile');
+                const profileData = saved ? JSON.parse(saved) : {};
+                profileData.photoUrl = photoUrl;
+                localStorage.setItem('quran_profile', JSON.stringify(profileData));
+            };
+            reader.readAsDataURL(file);
         }
     }
 };

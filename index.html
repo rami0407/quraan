@@ -7,7 +7,7 @@
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Tajawal:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Amiri+Quran&family=Tajawal:wght@300;400;500;700;800&display=swap" rel="stylesheet">
     <!-- Icons -->
     <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
     <!-- CSS -->
@@ -37,6 +37,10 @@
                 <i class="ri-book-read-line"></i>
                 <span>المصحف</span>
             </li>
+            <li data-page="audio">
+                <i class="ri-headphone-line"></i>
+                <span>الاستماع للقرآن</span>
+            </li>
             <li data-page="hifz">
                 <i class="ri-brain-line"></i>
                 <span>المحفوظات</span>
@@ -48,6 +52,14 @@
             <li data-page="community">
                 <i class="ri-discuss-line"></i>
                 <span>المنتدى</span>
+            </li>
+            <li data-page="analytics">
+                <i class="ri-bar-chart-box-line"></i>
+                <span>حصاد الإنجاز</span>
+            </li>
+            <li data-page="profile">
+                <i class="ri-user-3-line"></i>
+                <span>ملفي الشخصي</span>
             </li>
         </ul>
 
@@ -68,7 +80,7 @@
         <!-- Topbar -->
         <header class="topbar">
             <div style="display: flex; gap: 15px; align-items: center;">
-                <button class="icon-btn mobile-only" onclick="app.toggleMobileSidebar()" style="display: none;">
+                <button class="icon-btn mobile-only" onclick="app.toggleMobileSidebar()">
                     <i class="ri-menu-fill"></i>
                 </button>
                 <div class="date-widget" id="hijri-date">
@@ -77,10 +89,26 @@
                 </div>
             </div>
             
-            <div class="user-profile">
-                <button class="icon-btn"><i class="ri-notification-3-line"></i></button>
-                <div class="avatar">
-                    <img src="https://ui-avatars.com/api/?name=User&background=C9A84C&color=0D1B2A" alt="المستخدم">
+            <div class="user-profile" style="display: flex; align-items: center; gap: 15px;">
+                <!-- Notifications Dropdown -->
+                <div style="position: relative;">
+                    <button class="icon-btn" onclick="app.toggleNotifications()">
+                        <i class="ri-notification-3-line"></i>
+                    </button>
+                    <div id="notifications-menu" class="glass-panel" style="display: none; position: absolute; top: 110%; left: 0; min-width: 250px; z-index: 1000; padding: 15px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+                        <h4 style="margin-bottom: 10px; color: var(--gold-primary); border-bottom: 1px solid var(--glass-border); padding-bottom: 5px;">الإشعارات</h4>
+                        <div>
+                            <p style="color: var(--text-secondary); text-align: center; font-size: 0.9rem;">لا توجد إشعارات حالياً</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Enhanced User Avatar -->
+                <div style="display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); padding: 5px 15px 5px 5px; border-radius: 30px;">
+                    <span id="topbar-user-name" style="font-weight: 600; font-size: 0.95rem; color: var(--text-primary);">ضيف</span>
+                    <div class="avatar">
+                        <img id="topbar-user-avatar" src="https://ui-avatars.com/api/?name=User&background=C9A84C&color=0D1B2A&font-family=Tajawal" alt="المستخدم" style="border: 2px solid var(--gold-primary);">
+                    </div>
                 </div>
             </div>
         </header>
@@ -145,8 +173,11 @@
             <section id="page-quran" class="page-section">
                 <div class="quran-toolbar glass-panel" style="flex-wrap: wrap; gap: 10px;">
                     <div class="toolbar-group">
-                        <select id="surah-select" class="glass-select">
+                        <select id="surah-select" class="glass-select" style="margin-left: 5px;">
                             <option value="">جاري تحميل السور...</option>
+                        </select>
+                        <select id="juz-select" class="glass-select">
+                            <option value="">جاري تحميل الأجزاء...</option>
                         </select>
                         <div class="divider"></div>
                         <span id="current-page-display">--</span>
@@ -296,6 +327,309 @@
                     <div class="loading-spinner"></div>
                 </div>
             </section>
+
+            <!-- Audio Listening Page -->
+            <section id="page-audio" class="page-section">
+                <div class="welcome-card glass-panel mb-2">
+                    <div class="welcome-content">
+                        <h1>الاستماع إلى القرآن الكريم</h1>
+                        <p>استمع لتلاوة القرآن بصوت قارئك المفضل.</p>
+                    </div>
+                    <div class="welcome-image">
+                        <i class="ri-headphone-line gold-text" style="font-size: 7rem; opacity: 0.4;"></i>
+                    </div>
+                </div>
+
+                <div class="glass-panel" style="padding: 25px;">
+                    <div style="display: flex; gap: 15px; flex-wrap: wrap; margin-bottom: 25px;">
+                        <select id="audio-page-reciter" class="glass-select" style="flex: 1;" onchange="app.audioPage.loadSurah()">
+                            <option value="ar.alafasy">مشاري العفاسي</option>
+                            <option value="ar.abdulbasitmurattal">عبد الباسط عبد الصمد</option>
+                            <option value="ar.abdurrahmaansudais">عبدالرحمن السديس</option>
+                            <option value="ar.husary">محمود خليل الحصري</option>
+                            <option value="ar.mahermuaiqly">ماهر المعيقلي</option>
+                        </select>
+                        <select id="audio-page-surah" class="glass-select" style="flex: 1;" onchange="app.audioPage.loadSurah()">
+                            <!-- Surahs will be injected -->
+                            <option value="1">جاري التحميل...</option>
+                        </select>
+                    </div>
+
+                    <div style="background: rgba(0,0,0,0.3); padding: 20px; border-radius: 16px; text-align: center;">
+                        <h2 id="audio-page-title" style="color: var(--gold-primary); margin-bottom: 20px;">سورة الفاتحة</h2>
+                        
+                        <audio id="full-surah-player" controls style="width: 100%; outline: none; border-radius: 30px;"></audio>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Analytics & Productivity Page -->
+            <section id="page-analytics" class="page-section">
+                <div class="welcome-card glass-panel mb-2">
+                    <div class="welcome-content">
+                        <h1>حصاد الإنجاز</h1>
+                        <p>تابع مستواك وتعرف على إحصائيات تلاوتك وحفظك للقرآن الكريم.</p>
+                    </div>
+                    <div class="welcome-image">
+                        <i class="ri-bar-chart-2-line gold-text" style="font-size: 7rem; opacity: 0.4;"></i>
+                    </div>
+                </div>
+
+                <div class="dashboard-grid mb-2">
+                    <div class="dash-card glass-panel">
+                        <div class="card-icon"><i class="ri-book-open-fill gold-text"></i></div>
+                        <div class="card-info">
+                            <h3>الصفحات المقروءة</h3>
+                            <p class="value" id="analytics-pages-count">0</p>
+                        </div>
+                    </div>
+                    <div class="dash-card glass-panel">
+                        <div class="card-icon"><i class="ri-fire-fill" style="color: #e74c3c;"></i></div>
+                        <div class="card-info">
+                            <h3>أيام الاستمرار (Streak)</h3>
+                            <p class="value" id="analytics-streak">0 يوم</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hifz Review Scheduler -->
+                <div class="glass-panel" style="padding: 25px; margin-top: 20px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--glass-border); padding-bottom: 15px; margin-bottom: 20px;">
+                        <div>
+                            <h3 style="color: var(--gold-primary);"><i class="ri-calendar-todo-line"></i> جدول المراجعة الذكي</h3>
+                            <p style="font-size: 0.9rem; color: var(--text-secondary); margin-top: 5px;">يقوم باختيار آيات عشوائية أو آيات ضعيفة الحفظ لاختبارك بها يومياً.</p>
+                        </div>
+                        <label class="switch" style="position: relative; display: inline-block; width: 60px; height: 34px;">
+                            <input type="checkbox" id="hifz-tester-toggle" onchange="app.analytics.toggleHifzTester()" style="opacity: 0; width: 0; height: 0;">
+                            <span class="slider round" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 34px;"></span>
+                        </label>
+                    </div>
+                    
+                    <div id="hifz-test-container" style="display: none; background: rgba(0,0,0,0.2); padding: 20px; border-radius: 12px; text-align: center;">
+                        <!-- Content goes here -->
+                        <h4 style="margin-bottom: 15px; color: #f1c40f;">اختبار مراجعة سريع:</h4>
+                        <p id="hifz-test-ayah" style="font-family: var(--font-quran); font-size: 1.5rem; line-height: 2; color: var(--text-primary); margin-bottom: 20px;"></p>
+                        <button class="btn-outline" onclick="app.analytics.generateNextTest()">الآية التالية <i class="ri-refresh-line"></i></button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Profile Page -->
+            <section id="page-profile" class="page-section">
+
+                <!-- === البانر الشخصي === -->
+                <div class="profile-banner-card glass-panel mb-2">
+                    <div class="profile-banner-bg">
+                        <div class="banner-pattern"></div>
+                        <div class="banner-glow"></div>
+                    </div>
+                    <div class="profile-banner-body">
+                        <!-- الصورة الشخصية -->
+                        <div class="profile-avatar-wrap">
+                            <img id="profile-avatar-display" src="https://ui-avatars.com/api/?name=User&background=C9A84C&color=0D1B2A&size=120&bold=true" alt="صورة المستخدم">
+                            <label class="avatar-camera-btn" title="تغيير الصورة">
+                                <i class="ri-camera-fill"></i>
+                                <input type="file" accept="image/*" id="profile-photo-input" style="display:none;" onchange="app.profile.handlePhotoUpload(event)">
+                            </label>
+                        </div>
+
+                        <!-- معلومات البانر -->
+                        <div class="profile-banner-info">
+                            <div class="profile-name-row">
+                                <h2 id="profile-name-display" class="profile-display-name">مستخدم</h2>
+                                <button class="profile-edit-name-btn" onclick="app.profile.toggleInlineEdit()" title="تعديل الاسم">
+                                    <i class="ri-edit-2-line"></i>
+                                </button>
+                            </div>
+                            <div id="profile-inline-edit" class="profile-inline-edit" style="display:none;">
+                                <input id="profile-inline-name-input" class="profile-inline-input" type="text" placeholder="اسمك...">
+                                <button onclick="app.profile.saveInlineName()" class="profile-inline-save"><i class="ri-check-line"></i></button>
+                                <button onclick="app.profile.toggleInlineEdit()" class="profile-inline-cancel"><i class="ri-close-line"></i></button>
+                            </div>
+                            <p id="profile-country-display" class="profile-country-text"><i class="ri-map-pin-2-line"></i> —</p>
+                            <p id="profile-bio-display" class="profile-bio-text"></p>
+
+                            <!-- إحصائيات سريعة في البانر -->
+                            <div class="profile-quick-stats">
+                                <div class="pqs-item">
+                                    <span class="pqs-val" id="pqs-pages">0</span>
+                                    <span class="pqs-label">صفحة</span>
+                                </div>
+                                <div class="pqs-sep"></div>
+                                <div class="pqs-item">
+                                    <span class="pqs-val" id="pqs-streak">0</span>
+                                    <span class="pqs-label">يوم متواصل</span>
+                                </div>
+                                <div class="pqs-sep"></div>
+                                <div class="pqs-item">
+                                    <span class="pqs-val" id="pqs-badges">0</span>
+                                    <span class="pqs-label">شارة</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- أزرار البانر -->
+                        <div class="profile-banner-actions">
+                            <button class="btn-primary" onclick="app.profile.saveProfile()" id="profile-save-btn">
+                                <i class="ri-save-3-line"></i> حفظ الملف
+                            </button>
+                            <button class="profile-share-btn" onclick="app.profile.copyInviteLink()" title="مشاركة الملف">
+                                <i class="ri-share-forward-line"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- === شارات الإنجاز === -->
+                <div class="glass-panel profile-section-card mb-2">
+                    <div class="profile-section-header">
+                        <h3><i class="ri-medal-fill" style="color: var(--gold-primary);"></i> الشارات والإنجازات</h3>
+                        <span class="badge-count-chip" id="badge-count-chip">0 / 10</span>
+                    </div>
+                    <div id="badges-grid" class="badges-grid">
+                        <!-- شارات تُحقن عبر JS -->
+                        <div class="loading-spinner" style="width:30px;height:30px;border-width:3px;margin:20px auto;"></div>
+                    </div>
+                </div>
+
+                <!-- === مخطط نشاط القراءة === -->
+                <div class="glass-panel profile-section-card mb-2">
+                    <div class="profile-section-header">
+                        <h3><i class="ri-calendar-2-line" style="color: var(--gold-primary);"></i> نشاط القراءة — آخر 30 يومًا</h3>
+                        <span id="activity-total-label" style="font-size:0.85rem; color:var(--text-secondary);">جاري الحساب...</span>
+                    </div>
+                    <div class="activity-chart-wrap">
+                        <div id="activity-chart" class="activity-chart"></div>
+                        <div class="activity-legend">
+                            <span style="color:var(--text-secondary); font-size:0.8rem;">أقل</span>
+                            <div class="legend-dot" style="background:rgba(201,168,76,0.1);"></div>
+                            <div class="legend-dot" style="background:rgba(201,168,76,0.3);"></div>
+                            <div class="legend-dot" style="background:rgba(201,168,76,0.6);"></div>
+                            <div class="legend-dot" style="background:rgba(201,168,76,0.9);"></div>
+                            <div class="legend-dot" style="background:#C9A84C;"></div>
+                            <span style="color:var(--text-secondary); font-size:0.8rem;">أكثر</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- === شبكة سفلية: تعديل + دعوة + خصوصية === -->
+                <div class="profile-bottom-grid">
+
+                    <!-- تعديل المعلومات الشخصية -->
+                    <div class="glass-panel profile-section-card" style="grid-column: 1 / -1;">
+                        <div class="profile-section-header mb-2">
+                            <h3><i class="ri-user-settings-line" style="color:var(--gold-primary);"></i> المعلومات الشخصية</h3>
+                        </div>
+                        <div class="profile-form-grid">
+                            <div class="profile-form-field">
+                                <label>اسم العرض <span style="color:var(--text-secondary); font-size:0.8rem;">(يراه الأعضاء)</span></label>
+                                <input id="profile-display-name" class="glass-input" type="text" placeholder="كيف تريد أن يراك الآخرون..." style="margin-bottom:0;">
+                            </div>
+                            <div class="profile-form-field">
+                                <label>الاسم الكامل <span style="color:var(--text-secondary); font-size:0.8rem;">(خاص)</span></label>
+                                <input id="profile-full-name" class="glass-input" type="text" placeholder="اسمك الكامل..." style="margin-bottom:0;">
+                            </div>
+                            <div class="profile-form-field">
+                                <label>البلد</label>
+                                <select id="profile-country" class="glass-select" style="width:100%;">
+                                    <option value="">— اختر بلدك —</option>
+                                    <option>السعودية</option><option>الإمارات</option><option>الكويت</option>
+                                    <option>قطر</option><option>البحرين</option><option>عُمان</option>
+                                    <option>الأردن</option><option>فلسطين</option><option>مصر</option>
+                                    <option>المغرب</option><option>تونس</option><option>الجزائر</option>
+                                    <option>ليبيا</option><option>اليمن</option><option>سوريا</option>
+                                    <option>العراق</option><option>تركيا</option><option>باكستان</option>
+                                    <option>إندونيسيا</option><option>ماليزيا</option><option>أخرى</option>
+                                </select>
+                            </div>
+                            <div class="profile-form-field">
+                                <label>العمر</label>
+                                <input id="profile-age" class="glass-input" type="number" min="10" max="100" placeholder="عمرك..." style="margin-bottom:0;">
+                            </div>
+                            <div class="profile-form-field" style="grid-column: 1 / -1;">
+                                <label>نبذة عني</label>
+                                <textarea id="profile-bio" class="glass-input" rows="3" placeholder="أخبرنا قليلاً عن نفسك، أهدافك القرآنية..." style="resize:vertical; margin-bottom:0;"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- رابط الدعوة -->
+                    <div class="glass-panel profile-section-card profile-invite-card">
+                        <div class="profile-section-header mb-2">
+                            <h3><i class="ri-links-line" style="color:#2ecc71;"></i> رابط الدعوة الشخصي</h3>
+                        </div>
+                        <p style="font-size:0.9rem; color:var(--text-secondary); margin-bottom:15px;">شارك هذا الرابط لدعوة أصدقائك لتطبيق ختمة</p>
+                        <div class="invite-link-box">
+                            <input id="invite-link-input" class="invite-link-input" type="text" readonly>
+                            <button class="invite-copy-btn" onclick="app.profile.copyInviteLink()" id="invite-copy-btn">
+                                <i class="ri-clipboard-line"></i> نسخ
+                            </button>
+                        </div>
+                        <div style="margin-top:15px; display:flex; gap:10px; flex-wrap:wrap;">
+                            <button class="share-platform-btn whatsapp-btn" onclick="app.profile.shareViaWhatsApp()">
+                                <i class="ri-whatsapp-line"></i> واتساب
+                            </button>
+                            <button class="share-platform-btn twitter-btn" onclick="app.profile.shareViaTwitter()">
+                                <i class="ri-twitter-x-line"></i> تويتر
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- الإحصاءات + الخصوصية -->
+                    <div style="display:flex; flex-direction:column; gap:20px;">
+                        <!-- الإحصاءات -->
+                        <div class="glass-panel profile-section-card">
+                            <div class="profile-section-header mb-2">
+                                <h3><i class="ri-bar-chart-box-line" style="color:var(--gold-primary);"></i> إحصائياتي</h3>
+                            </div>
+                            <div style="display:flex; flex-direction:column; gap:10px;">
+                                <div class="stat-row-item">
+                                    <span><i class="ri-book-open-line gold-text"></i> صفحات مقروءة</span>
+                                    <strong class="gold-text" id="profile-stat-pages">0</strong>
+                                </div>
+                                <div class="stat-row-item">
+                                    <span><i class="ri-fire-line" style="color:#e74c3c;"></i> أيام الاستمرار</span>
+                                    <strong class="gold-text" id="profile-stat-streak">0 يوم</strong>
+                                </div>
+                                <div class="stat-row-item">
+                                    <span><i class="ri-calendar-check-line" style="color:#2ecc71;"></i> تاريخ الانضمام</span>
+                                    <strong class="gold-text" id="profile-stat-joined" style="font-size:0.85rem;">—</strong>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- الخصوصية -->
+                        <div class="glass-panel profile-section-card">
+                            <div class="profile-section-header mb-2">
+                                <h3><i class="ri-shield-user-line" style="color:var(--gold-primary);"></i> الخصوصية</h3>
+                            </div>
+                            <div style="display:flex; flex-direction:column; gap:18px;">
+                                <div class="privacy-row">
+                                    <div>
+                                        <p style="font-size:0.95rem;"><i class="ri-eye-line"></i> ملفي ظاهر للأعضاء</p>
+                                        <p style="font-size:0.8rem; color:var(--text-secondary); margin-top:3px;">يسمح للآخرين برؤية ملفك</p>
+                                    </div>
+                                    <label class="switch" style="position:relative; display:inline-block; width:60px; height:34px; flex-shrink:0;">
+                                        <input type="checkbox" id="privacy-public" style="opacity:0;width:0;height:0;" checked>
+                                        <span class="slider round"></span>
+                                    </label>
+                                </div>
+                                <div class="privacy-row">
+                                    <div>
+                                        <p style="font-size:0.95rem;"><i class="ri-mail-line"></i> استقبال الرسائل</p>
+                                        <p style="font-size:0.8rem; color:var(--text-secondary); margin-top:3px;">يسمح للأعضاء بمراسلتك</p>
+                                    </div>
+                                    <label class="switch" style="position:relative; display:inline-block; width:60px; height:34px; flex-shrink:0;">
+                                        <input type="checkbox" id="privacy-messages" style="opacity:0;width:0;height:0;" checked>
+                                        <span class="slider round"></span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </section>
         </div>
     </main>
 
@@ -345,6 +679,62 @@
             <p style="margin-bottom: 20px; color: var(--text-secondary);">للمشاركة مع الجماعة، يرجى إدخال اسمك ليراه أصدقاؤك عند حجز الأجزاء:</p>
             <input type="text" id="user-name-input" class="glass-input" placeholder="الاسم (مثال: أحمد، أم فلان)...">
             <button class="btn-primary" style="width: 100%; justify-content: center;" onclick="app.saveUserName()">حفظ ومتابعة</button>
+        </div>
+    </div>
+
+    <!-- Ayah Action Sheet -->
+    <div class="modal-overlay" id="ayah-action-sheet" style="display: none; align-items: flex-end;">
+        <div class="glass-panel" style="width: 100%; border-radius: 20px 20px 0 0; display: flex; flex-direction: column; background: var(--bg-darker); padding: 20px; animation: slideUp 0.3s ease; max-height: 80vh; overflow-y: auto;">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--glass-border); padding-bottom: 10px; margin-bottom: 15px; position: sticky; top: -20px; background: var(--bg-darker); z-index: 10;">
+                <h3 id="action-sheet-title" style="color: var(--gold-primary); font-family: var(--font-primary);">سورة الأنعام - آية 1</h3>
+                <button class="icon-btn" onclick="document.getElementById('ayah-action-sheet').style.display='none'; document.getElementById('ayah-audio-player').pause();" style="width: 35px; height: 35px;"><i class="ri-close-line"></i></button>
+            </div>
+            
+            <div id="action-sheet-loading" style="text-align: center; padding: 30px;">
+                <div class="loading-spinner" style="width: 40px; height: 40px; margin: 0 auto; border-width: 3px;"></div>
+                <p style="margin-top: 15px; color: var(--text-secondary);">جاري تحميل الصوت والتفسير...</p>
+            </div>
+
+            <div id="action-sheet-content" style="display: none; flex-direction: column; gap: 20px;">
+                
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <select id="action-sheet-reciter" class="glass-select" style="flex: 1; font-size: 0.9rem; padding: 8px;" onchange="app.reader.changeActionSheetOptions()">
+                        <option value="ar.alafasy">مشاري العفاسي</option>
+                        <option value="ar.abdulbasitmurattal">عبد الباسط عبد الصمد</option>
+                        <option value="ar.abdurrahmaansudais">السديس</option>
+                        <option value="ar.husary">الحصري</option>
+                    </select>
+                    <select id="action-sheet-tafsir" class="glass-select" style="flex: 1; font-size: 0.9rem; padding: 8px;" onchange="app.reader.changeActionSheetOptions()">
+                        <option value="ar.muyassar">التفسير الميسر</option>
+                        <option value="ar.jalalayn">تفسير الجلالين</option>
+                        <option value="ar.qurtubi">تفسير القرطبي</option>
+                    </select>
+                </div>
+
+                <!-- Audio Player -->
+                <div style="background: var(--glass-bg); padding: 15px; border-radius: 12px; display: flex; align-items: center; gap: 15px; border: 1px solid var(--glass-border);">
+                    <button class="icon-btn" id="ayah-play-btn" style="background: linear-gradient(135deg, #CFB059 0%, #B08D35 100%); color: #000; width: 55px; height: 55px; border: none; box-shadow: 0 4px 15px var(--gold-dim);" onclick="app.reader.toggleAyahAudio()">
+                        <i class="ri-play-fill" id="ayah-play-icon" style="font-size: 1.8rem; margin-left: 3px;"></i>
+                    </button>
+                    <div style="flex: 1;">
+                        <h4 id="action-sheet-reciter-name" style="margin-bottom: 8px; font-size: 0.95rem;">تلاوة مشاري العفاسي</h4>
+                        <audio id="ayah-audio-player" src=""></audio>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <span id="audio-current-time" style="font-size: 0.8rem; color: var(--text-secondary); min-width: 35px;">00:00</span>
+                            <div style="flex: 1; height: 6px; background: rgba(0,0,0,0.3); border-radius: 3px; position: relative; overflow: hidden;">
+                                <div id="audio-progress-bar" style="width: 0%; height: 100%; background: var(--gold-primary); border-radius: 3px; transition: width 0.1s linear;"></div>
+                            </div>
+                            <span id="audio-duration" style="font-size: 0.8rem; color: var(--text-secondary); min-width: 35px;">00:00</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tafsir -->
+                <div style="border-right: 4px solid var(--gold-primary); padding-right: 15px; background: rgba(255,255,255,0.02); padding: 15px 15px 15px 0; border-radius: 8px;">
+                    <h4 id="action-sheet-tafsir-name" style="color: #2ecc71; margin-bottom: 10px; font-family: var(--font-primary); font-size: 1.1rem;"><i class="ri-book-open-fill"></i> التفسير الميسر</h4>
+                    <p id="ayah-tafsir-text" style="color: var(--text-primary); line-height: 1.9; font-size: 1.05rem; text-align: justify;"></p>
+                </div>
+            </div>
         </div>
     </div>
 
